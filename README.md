@@ -2,7 +2,7 @@
 
 # crunches :muscle: 
 
-The (as of the time of writing this) smallest **and** fastest JavaScript value serialization library in the wild. **2 kB** gzipped. Efficiently encode and decode your values to and from `ArrayBuffer`s. Integrates very well with WebSockets.
+The (as of the time of writing this) smallest **and** fastest JavaScript value serialization library in the wild. **2.3 kB** gzipped. Efficiently encode and decode your values to and from `ArrayBuffer`s. Integrates very well with WebSockets.
 
 ## Example
 
@@ -75,7 +75,7 @@ In this example, the size of payload is only **22 bytes**. `JSON.stringify` woul
 
 [SchemaPack](https://github.com/phretaddin/schemapack/tree/master) (huge respect from and inspiration for this library! :heart:) is great for packing objects into Node buffers. Over time, this approach has become outdated in favor of modern standards like `ArrayBuffer`.
 
-It is also frequently desirable to preallocate and reuse buffers for performance reasons. SchemaPack always allocates new buffers when encoding. The performance hit is generally less than the naive case since Node is good about buffer pooling, but performance degrades in the browser (and doesn't exist on any other platform). Buffer reuse is the Correct Way™. Even with Node's pooling, we are still roughly **twice as fast or faster than SchemaPack** in many cases. (We could probably get even faster if we did crazy stuff like compiled unrolled codecs like SchemaPack does. PRs along those lines would be interesting if there's big gains! :muscle:)
+It is also frequently desirable to preallocate and reuse buffers for performance reasons. SchemaPack always allocates new buffers when encoding. The performance hit is generally less than the naive case since Node is good about buffer pooling, but performance degrades in the browser (and doesn't exist on any other platform). Buffer reuse is the Correct Way™.
 
 I also wanted an implementation that does amazing things like [boolean coalescence](#boolean-coalescence) and [optional fields](#optional-fields) (also with [coalescence](#optional-field-coalescence)) as well as supporting more even more types like `Map`s, `Set`s, `Date`s, etc.
 
@@ -160,7 +160,7 @@ class YourCodec {
   decode(view: DataView, target: {byteOffset: number}): any
 
   // return the number of bytes written
-  encode(value: any, view: DataView, byteOffset = 0): number
+  encode(value: any, view: DataView, byteOffset): number
 
   size(value: any): number
 
@@ -182,7 +182,7 @@ class MyDateCodec extends Codecs.string {
     return new Date(decoded);
   }
 
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     // convert it to a string
     const converted = new Date(value).toISOString();
     // pass it along to the `string` codec's encode method
