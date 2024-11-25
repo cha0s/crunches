@@ -202,6 +202,100 @@ All this codec does is coerce `Date`s to and from strings. It leans on the built
 
 Just set a key on the `Codecs` object and go. Too easy!
 
+## Schema types
+
+| Type Name | Bytes                                                                                                                                                   | Range of Values                                                 |
+|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
+| bool      | 1 (worst case, see [boolean coalescence](#boolean-coalescence))                                                                                         | Truthy values are coerced to `true`; falsy values to `false`    |
+| int8      | 1                                                                                                                                                       | -128 to 127                                                     |
+| uint8     | 1                                                                                                                                                       | 0 to 255                                                        |
+| int16     | 2                                                                                                                                                       | -32,768 to 32,767                                               |
+| uint16    | 2                                                                                                                                                       | 0 to 65,535                                                     |
+| int32     | 4                                                                                                                                                       | -2,147,483,648 to 2,147,483,647                                 |
+| uint32    | 4                                                                                                                                                       | 0 to 4,294,967,295                                              |
+| float32   | 4                                                                                                                                                       | 3.4E +/- 38 (7 digits)                                          |
+| float64   | 8                                                                                                                                                       | 1.7E +/- 308 (15 digits)                                        |
+| string    | 32-bit length prefix followed by the [encoded](https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder/encodeInto) string bytes                    | Any string                                                      |
+| buffer    | 32-bit length prefix followed by the bytes of the buffer                                                                                                | Any `ArrayBuffer`                                               |
+| date      | Same as `string` above after calling [`toIsoString`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString) | Value is coerced to `Date` e.g. `new Date(value).toIsoString()` |
+
+### Aggregate types
+
+#### `object`
+
+> Requires a `properties` key to define the properties on the object. Supports [`optional` fields](#optional-fields). Booleans are [coalesced](#boolean-coalescence).
+
+Example:
+
+```js
+const schema = new Schema({
+  type: 'object',
+  properties: {
+    foo: {type: 'uint32'},
+    bar: {type: 'string', optional: true},
+  },
+});
+
+// 14 = uint32 (4) + optional flag (1) + string prefix (4) + 'hello' (5)
+console.log(schema.size({foo: 32, bar: 'hello'}));
+// 5 = uint32 (4) + optional flag (1)
+console.log(schema.size({foo: 32}));
+```
+
+#### `array`
+
+> Requires an `element` key to define the structure of the array elements. Encodes a 32-bit prefix followed by the contents of the array.
+
+```js
+const schema = new Schema({
+  type: 'array',
+  element: {type: 'uint32'},
+});
+
+// 16 = array prefix (4) + uint32 (4) + uint32 (4) + uint32 (4)
+console.log(schema.size([1, 2, 3]));
+```
+
+#### `map`
+
+> Requires a `key` and `value` key to define the structure of the map. Any [iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) will be coerced as [entries](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/Map#iterable). Encoded as an array of entries. Decodes to a native `Map` object.
+
+```js
+const schema = new Schema({
+  type: 'map',
+  key: {type: 'int32'},
+  value: {type: 'string'},
+});
+
+const value = new Map();
+value.set(32, 'sup');
+value.set(64, 'hi');
+
+// 25 = array prefix (4) + int32 (4) + string prefix (4) + 'sup' (3) + int32 (4) + string prefix (4) + 'hi' (2)
+console.log(schema.size(value));
+// same, with coercion
+console.log(schema.size([[32, 'sup'], [64, 'hi']]));
+```
+
+#### `set`
+
+> Requires an `element` key to define the structure of the map. Any [iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) will be coerced. Encoded as an array. Decodes to a native `Set` object.
+
+```js
+const schema = new Schema({
+  type: 'set',
+  element: {type: 'string'},
+});
+
+const set = new Set();
+set.add('foo');
+set.add('bar');
+
+// 18 = array prefix (4) + string prefix (4) + 'foo' (3) + string prefix (4) + 'bar' (3)
+console.log(schema.size(set));
+// same, with coercion
+console.log(schema.size(['foo', 'bar']));
+```
 ## Notable differences from SchemaPack
 
 ### Monomorphic arrays
@@ -221,6 +315,7 @@ No validation is done on the values you encode. If you'd like to validate your v
 - Less-verbose blueprint?
 - BigInts?
 - Endianness?
+- Varint?
 
 # Q/A
 
