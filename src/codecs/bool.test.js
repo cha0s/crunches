@@ -7,7 +7,7 @@ test('bool', async () => {
   const value = true;
   const view = new DataView(new ArrayBuffer(codec.size(value)));
   codec.encode(value, view);
-  expect(codec.decode(view)).to.deep.equal(value);
+  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
 });
 
 test('coerced bool', async () => {
@@ -15,5 +15,5 @@ test('coerced bool', async () => {
   const value = 'truthy value';
   const view = new DataView(new ArrayBuffer(codec.size(value)));
   codec.encode(value, view);
-  expect(codec.decode(view)).to.deep.equal(!!value);
+  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(!!value);
 });

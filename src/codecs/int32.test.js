@@ -7,5 +7,5 @@ test('int32', async () => {
   const value = 32;
   const view = new DataView(new ArrayBuffer(codec.size(value)));
   codec.encode(value, view);
-  expect(codec.decode(view)).to.deep.equal(value);
+  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
 });

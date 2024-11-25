@@ -1,5 +1,5 @@
 class Float64Codec {
-  decode(view, target = {byteOffset: 0}) {
+  decode(view, target) {
     const value = view.getFloat64(target.byteOffset);
     target.byteOffset += 8;
     return value;

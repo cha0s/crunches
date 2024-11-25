@@ -23,7 +23,7 @@ class ObjectCodec {
     }
   }
 
-  decode(view, target = {byteOffset: 0}) {
+  decode(view, target) {
     const booleanFlags = [];
     const optionalFlags = [];
     let currentBoolean = 0;
@@ -38,8 +38,8 @@ class ObjectCodec {
     const value = {};
     for (const {codec, key, property} of this.$$codecs) {
       if (property.optional) {
-        const index = Math.floor(currentOptional / 8);
-        const bit = currentOptional % 8;
+        const index = currentOptional >> 3;
+        const bit = currentOptional & 7;
         currentOptional += 1;
         const isPresent = optionalFlags[index] & (1 << bit);
         if (!isPresent) {
@@ -50,8 +50,8 @@ class ObjectCodec {
         }
       }
       if ('bool' === property.type) {
-        const index = Math.floor(currentBoolean / 8);
-        const bit = currentBoolean % 8;
+        const index = currentBoolean >> 3;
+        const bit = currentBoolean & 7;
         currentBoolean += 1;
         booleanBackpatches.push({bit, index, key});
       }
@@ -81,8 +81,8 @@ class ObjectCodec {
     written += Math.ceil(this.$$optionals / 8);
     for (const {codec, key, property} of this.$$codecs) {
       if (property.optional) {
-        const index = Math.floor(currentOptional / 8);
-        const bit = currentOptional % 8;
+        const index = currentOptional >> 3;
+        const bit = currentOptional & 7;
         const isPresent = 'undefined' !== typeof value[key];
         optionalFlags[index] |= (isPresent ? 1 : 0) << bit;
         currentOptional += 1;
@@ -91,8 +91,8 @@ class ObjectCodec {
         }
       }
       if ('bool' === property.type) {
-        const index = Math.floor(currentBoolean / 8);
-        const bit = currentBoolean % 8;
+        const index = currentBoolean >> 3;
+        const bit = currentBoolean & 7;
         booleanFlags[index] |= (value[key] ? 1 : 0) << bit;
         currentBoolean += 1;
       }

@@ -1,5 +1,5 @@
 class Uint16Codec {
-  decode(view, target = {byteOffset: 0}) {
+  decode(view, target) {
     const value = view.getUint16(target.byteOffset);
     target.byteOffset += 2;
     return value;

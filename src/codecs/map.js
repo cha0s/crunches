@@ -15,7 +15,7 @@ class MapCodec extends ArrayCodec {
     });
   }
 
-  decode(view, target = {byteOffset: 0}) {
+  decode(view, target) {
     const value = new Map();
     for (const {key, value: mapValue} of super.decode(view, target)) {
       value.set(key, mapValue);

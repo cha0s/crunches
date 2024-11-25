@@ -9,7 +9,7 @@ class SetCodec extends ArrayCodec {
     });
   }
 
-  decode(view, target = {byteOffset: 0}) {
+  decode(view, target) {
     return new Set(super.decode(view, target));
   }
 

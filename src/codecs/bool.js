@@ -1,5 +1,5 @@
 class BoolCodec {
-  decode(view, target = {byteOffset: 0}) {
+  decode(view, target) {
     const value = !!view.getUint8(target.byteOffset);
     target.byteOffset += 1;
     return value;

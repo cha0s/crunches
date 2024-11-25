@@ -1,5 +1,5 @@
 class Uint32Codec {
-  decode(view, target = {byteOffset: 0}) {
+  decode(view, target) {
     const value = view.getUint32(target.byteOffset);
     target.byteOffset += 4;
     return value;

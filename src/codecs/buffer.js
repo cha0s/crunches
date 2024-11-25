@@ -1,6 +1,6 @@
 class BufferCodec {
 
-  decode(view, target = {byteOffset: 0}) {
+  decode(view, target) {
     const length = view.getUint32(target.byteOffset);
     target.byteOffset += 4;
     const value = new ArrayBuffer(length);

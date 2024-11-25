@@ -1,5 +1,5 @@
 class VarUintCodec {
-  decode(view, target = {byteOffset: 0}) {
+  decode(view, target) {
     let byte;
     let read = 0;
     let value = 0;

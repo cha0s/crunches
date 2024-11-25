@@ -3,7 +3,7 @@ import StringCodec from './string.js';
 // will coerce strings to `Date`s
 class DateCodec extends StringCodec {
 
-  decode(view, target = {byteOffset: 0}) {
+  decode(view, target) {
     return new Date(super.decode(view, target));
   }
 

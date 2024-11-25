@@ -7,7 +7,7 @@ test('float64', async () => {
   const value = 1 / 7;
   const view = new DataView(new ArrayBuffer(codec.size(value)));
   codec.encode(value, view);
-  expect(codec.decode(view)).to.deep.equal(value);
+  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
 });
 
 test('float64 infinity', async () => {
@@ -15,5 +15,5 @@ test('float64 infinity', async () => {
   const value = Infinity;
   const view = new DataView(new ArrayBuffer(codec.size(value)));
   codec.encode(value, view);
-  expect(codec.decode(view)).to.deep.equal(value);
+  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
 });

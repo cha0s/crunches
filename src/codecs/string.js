@@ -3,7 +3,7 @@ class StringCodec {
   static decoder = new TextDecoder();
   static encoder = new TextEncoder();
 
-  decode(view, target = {byteOffset: 0}) {
+  decode(view, target) {
     const length = view.getUint32(target.byteOffset);
     target.byteOffset += 4;
     if (0 === length) {
