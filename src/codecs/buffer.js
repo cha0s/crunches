@@ -3,11 +3,7 @@ class BufferCodec {
   decode(view, target) {
     const length = view.getUint32(target.byteOffset);
     target.byteOffset += 4;
-    const value = new ArrayBuffer(length);
-    if (0 === length) {
-      return value;
-    }
-    new Uint8Array(value).set(new Uint8Array(view.buffer, view.byteOffset + target.byteOffset));
+    const value = new DataView(view.buffer, view.byteOffset + target.byteOffset, length);
     target.byteOffset += length;
     return value;
   }

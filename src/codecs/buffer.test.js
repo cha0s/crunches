@@ -25,6 +25,6 @@ test('buffer', async () => {
   const bufferSchema = new Codec();
   const bufferView = new DataView(new ArrayBuffer(bufferSchema.size(mapView.buffer)));
   bufferSchema.encode(mapView.buffer, bufferView, 0);
-  const newMapView = new DataView(bufferSchema.decode(bufferView, {byteOffset: 0}));
+  const newMapView = bufferSchema.decode(bufferView, {byteOffset: 0});
   expect(mapSchema.decode(newMapView, {byteOffset: 0})).to.deep.equal(value);
 });
