@@ -1,4 +1,3 @@
-
 class Int16Codec {
   decode(view, byteOffset = 0) {
     return {read: 2, value: view.getInt16(byteOffset)};

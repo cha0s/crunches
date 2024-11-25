@@ -1,4 +1,3 @@
-
 class Float32Codec {
   decode(view, byteOffset = 0) {
     return {read: 4, value: view.getFloat32(byteOffset)};

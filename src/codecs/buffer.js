@@ -1,4 +1,3 @@
-
 class BufferCodec {
 
   decode(view, byteOffset = 0) {

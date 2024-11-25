@@ -1,4 +1,3 @@
-
 class Uint8Codec {
   decode(view, byteOffset = 0) {
     return {read: 1, value: view.getUint8(byteOffset)};

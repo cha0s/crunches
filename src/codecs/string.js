@@ -1,4 +1,3 @@
-
 class StringCodec {
 
   static decoder = new TextDecoder();

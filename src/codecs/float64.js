@@ -1,4 +1,3 @@
-
 class Float64Codec {
   decode(view, byteOffset = 0) {
     return {read: 8, value: view.getFloat64(byteOffset)};

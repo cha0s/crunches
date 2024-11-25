@@ -1,4 +1,3 @@
-
 class Uint32Codec {
   decode(view, byteOffset = 0) {
     return {read: 4, value: view.getUint32(byteOffset)};

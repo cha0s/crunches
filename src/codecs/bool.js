@@ -1,4 +1,3 @@
-
 class BoolCodec {
   decode(view, byteOffset = 0) {
     return {read: 1, value: !!view.getUint8(byteOffset)};
