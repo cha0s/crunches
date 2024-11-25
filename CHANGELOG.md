@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/cha0s/crunches/compare/crunches-v1.1.0...crunches-v1.1.1) (2024-11-25)
+
+
+### Performance Improvements
+
+* byteOffset as a side-effect ([a1c9b8a](https://github.com/cha0s/crunches/commit/a1c9b8af8713d9bc85d1fea2016365c49c040255))
+
 ## [1.1.0](https://github.com/cha0s/crunches/compare/crunches-v1.0.0...crunches-v1.1.0) (2024-11-25)
 
 
