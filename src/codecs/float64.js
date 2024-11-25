@@ -4,7 +4,7 @@ class Float64Codec {
     target.byteOffset += 8;
     return value;
   }
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     view.setFloat64(byteOffset, value);
     return 8;
   }

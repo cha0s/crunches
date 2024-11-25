@@ -7,7 +7,7 @@ class DateCodec extends StringCodec {
     return new Date(super.decode(view, target));
   }
 
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     return super.encode(new Date(value).toISOString(), view, byteOffset);
   }
 

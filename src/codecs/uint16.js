@@ -4,7 +4,7 @@ class Uint16Codec {
     target.byteOffset += 2;
     return value;
   }
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     view.setUint16(byteOffset, value);
     return 2;
   }

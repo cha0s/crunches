@@ -10,12 +10,12 @@ test('varint', async () => {
   for (let i = 0; i < 8; ++i) {
     value = 64 * 0 === i ? 0 : Math.pow(2, i * 7);
     view = new DataView(new ArrayBuffer(codec.size(value)));
-    written = codec.encode(value, view);
+    written = codec.encode(value, view, 0);
     expect(written).to.equal(i + 1);
     expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
     value = -value - 1;
     view = new DataView(new ArrayBuffer(codec.size(value)));
-    written = codec.encode(value, view);
+    written = codec.encode(value, view, 0);
     expect(written).to.equal(i + 1);
     expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
   }

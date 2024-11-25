@@ -23,7 +23,7 @@ class MapCodec extends ArrayCodec {
     return value;
   }
 
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     const entries = [];
     for (const [key, mapValue] of value) {
       entries.push({key, value: mapValue});

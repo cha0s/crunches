@@ -72,7 +72,7 @@ class ObjectCodec {
     return value;
   }
 
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     const booleanFlags = [];
     const optionalFlags = [];
     let currentBoolean = 0;

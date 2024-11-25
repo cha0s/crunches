@@ -9,7 +9,7 @@ test('varuint', async () => {
   for (let i = 0; i < 8; ++i) {
     const value = 128 * 0 === i ? 0 : Math.pow(2, i * 7);
     view = new DataView(new ArrayBuffer(codec.size(value)));
-    written = codec.encode(value, view);
+    written = codec.encode(value, view, 0);
     expect(written).to.equal(i + 1);
     expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
   }

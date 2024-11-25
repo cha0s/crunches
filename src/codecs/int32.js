@@ -4,7 +4,7 @@ class Int32Codec {
     target.byteOffset += 4;
     return value;
   }
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     view.setInt32(byteOffset, value);
     return 4;
   }

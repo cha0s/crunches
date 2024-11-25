@@ -19,7 +19,7 @@ test('map', async () => {
   });
   const value = new Map([[1, 'one'], [2, 'two']]);
   const view = new DataView(new ArrayBuffer(codec.size(value)));
-  codec.encode(value, view);
+  codec.encode(value, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
 });
 
@@ -30,6 +30,6 @@ test('coerce map', async () => {
   });
   const value = [[1, 'one'], [2, 'two']];
   const view = new DataView(new ArrayBuffer(codec.size(value)));
-  codec.encode(value, view);
+  codec.encode(value, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(new Map(value));
 });

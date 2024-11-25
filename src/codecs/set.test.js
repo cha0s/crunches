@@ -12,7 +12,7 @@ test('set', async () => {
   });
   const value = new Set([1, 2, 3, 4]);
   const view = new DataView(new ArrayBuffer(codec.size(value)));
-  codec.encode(value, view);
+  codec.encode(value, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
 });
 
@@ -22,6 +22,6 @@ test('coerce set', async () => {
   });
   const value = [1, 2, 3, 4];
   const view = new DataView(new ArrayBuffer(codec.size(value)));
-  codec.encode(value, view);
+  codec.encode(value, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(new Set(value));
 });

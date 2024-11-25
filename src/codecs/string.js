@@ -14,7 +14,7 @@ class StringCodec {
     return this.constructor.decoder.decode(stringView);
   }
 
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     const {written} = this.constructor.encoder.encodeInto(
       value,
       new Uint8Array(view.buffer, view.byteOffset + byteOffset + 4),

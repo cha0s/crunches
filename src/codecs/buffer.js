@@ -12,7 +12,7 @@ class BufferCodec {
     return value;
   }
 
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     view.setUint32(byteOffset, value.byteLength);
     new Uint8Array(view.buffer, view.byteOffset).set(new Uint8Array(value), byteOffset + 4);
     return 4 + value.byteLength;

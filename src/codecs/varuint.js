@@ -13,7 +13,7 @@ class VarUintCodec {
     } while (byte & 128);
     return value;
   }
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     let written = 0;
     while (value > 127) {
       view.setUint8(byteOffset + written, (value % 128) + 128);

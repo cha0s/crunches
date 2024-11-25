@@ -17,7 +17,7 @@ test('object', async () => {
     },
   });
   const view = new DataView(new ArrayBuffer(codec.size({1: 32, 2: 32})));
-  codec.encode({1: 32, 2: 32}, view);
+  codec.encode({1: 32, 2: 32}, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal({1: 32, 2: 32});
 });
 
@@ -73,13 +73,13 @@ test('object optional property', async () => {
   });
   expect(codec.size({1: 32, 2: 32, 3: {4: 32}})).to.equal(5);
   const view = new DataView(new ArrayBuffer(codec.size({1: 32, 2: 32, 3: {4: 32}})));
-  codec.encode({1: 32, 2: 32, 3: {4: 32}}, view);
+  codec.encode({1: 32, 2: 32, 3: {4: 32}}, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal({1: 32, 2: 32, 3: {4: 32}});
-  codec.encode({1: 32, 2: 32, 3: {}}, view);
+  codec.encode({1: 32, 2: 32, 3: {}}, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal({1: 32, 2: 32, 3: {}});
-  codec.encode({1: 32, 2: 32}, view);
+  codec.encode({1: 32, 2: 32}, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal({1: 32, 2: 32});
-  codec.encode({1: 32}, view);
+  codec.encode({1: 32}, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal({1: 32});
 });
 
@@ -93,7 +93,7 @@ test('object boolean properties', async () => {
   const codec = new Codec(blueprint);
   expect(codec.size(value)).to.equal(1);
   const view = new DataView(new ArrayBuffer(codec.size(value)));
-  codec.encode(value, view);
+  codec.encode(value, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
 });
 
@@ -106,7 +106,7 @@ test('object boolean optional interaction', async () => {
   const codec = new Codec(blueprint);
   expect(codec.size(value)).to.equal(1);
   const view = new DataView(new ArrayBuffer(codec.size(value)));
-  const written = codec.encode(value, view);
+  const written = codec.encode(value, view, 0);
   expect(written).to.equal(1);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
 });

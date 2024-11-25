@@ -4,7 +4,7 @@ class Uint8Codec {
     target.byteOffset += 1;
     return value;
   }
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     view.setUint8(byteOffset, value);
     return 1;
   }

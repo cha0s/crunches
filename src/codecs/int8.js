@@ -4,7 +4,7 @@ class Int8Codec {
     target.byteOffset += 1;
     return value;
   }
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     view.setInt8(byteOffset, value);
     return 1;
   }

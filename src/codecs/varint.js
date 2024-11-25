@@ -6,7 +6,7 @@ class VarIntCodec extends VarUintCodec {
     const half = Math.floor(varuint / 2);
     return varuint & 1 ? -half - 1 : half;
   }
-  encode(value, view, byteOffset = 0) {
+  encode(value, view, byteOffset) {
     value *= 2;
     return super.encode(value < 0 ? -value - 1 : value, view, byteOffset);
   }
