@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.2.0](https://github.com/cha0s/crunches/compare/crunches-v1.1.0...crunches-v1.2.0) (2024-11-25)
+
+
+### Features
+
+* object codec compilation ([9637235](https://github.com/cha0s/crunches/commit/9637235850b644ddb9468f66151b2b53a0753646))
+
+
+### Bug Fixes
+
+* perf ([ad0f8b8](https://github.com/cha0s/crunches/commit/ad0f8b84580f23dcd9785dd308015e54642ae17d))
+
+
+### Performance Improvements
+
+* byteOffset as a side-effect ([a1c9b8a](https://github.com/cha0s/crunches/commit/a1c9b8af8713d9bc85d1fea2016365c49c040255))
+* defaults ([7ada42d](https://github.com/cha0s/crunches/commit/7ada42d58b8460f612d788afb9f3017723a6b15d))
+* defaults ([5334760](https://github.com/cha0s/crunches/commit/5334760aeffc1c79532df12eadc689e23b901db8))
+* mul vs pow ([4b95928](https://github.com/cha0s/crunches/commit/4b95928d3d91731cacf4d8dcb2a6269dc3a6b0ab))
+
 ## [1.1.0](https://github.com/cha0s/crunches/compare/crunches-v1.0.0...crunches-v1.1.0) (2024-11-25)
 
 
