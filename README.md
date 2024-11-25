@@ -59,14 +59,9 @@ On the client:
 socket.on('player-data', (buffer) => {
   // create a view over the buffer
   const view = new DataView(buffer);
-  // pass the view to the decoder
-  const decoded = playerSchema.decode(view);
-  // the decoder returns the number of bytes read and the value
-  console.log(decoded); // {read: 22, value: {...}}
-  const player = decoded.value;
-  // or if you're feeling elegant,
-  const {value: player} = playerSchema.decode(new DataView(buffer));
-}
+  // pass the view to the decoder to get the value
+  const player = playerSchema.decode(view);
+});
 ```
 
 In this example, the size of payload is only **22 bytes**. `JSON.stringify` would consume **124 bytes**.
@@ -160,8 +155,9 @@ class YourCodec {
   decode(view: DataView, target: {byteOffset: number}): any
 
   // return the number of bytes written
-  encode(value: any, view: DataView, byteOffset): number
+  encode(value: any, view: DataView, byteOffset: number): number
 
+  // get the encoded size of a value
   size(value: any): number
 
 }
