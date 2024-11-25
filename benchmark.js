@@ -61,19 +61,19 @@ else {
   for (let i = 0; i < N; ++i) {
     schemaPackPerson.encode(value);
   }
-  console.log('SchemaPack\t', performance.now() - schemaPackEncodeStart);
+  console.log('SchemaPack\t', (performance.now() - schemaPackEncodeStart).toFixed(2), 'ms');
 
   const crunchesPerson = new Schema(blueprint);
   value.opaque = opaque.buffer;
   const crunchesView = new DataView(new ArrayBuffer(crunchesPerson.size(value)));
   for (let i = 0; i < N; ++i) {
-    crunchesPerson.encode(value, crunchesView);
+    crunchesPerson.encode(value, crunchesView, 0);
   }
   const crunchesEncodeStart = performance.now();
   for (let i = 0; i < N; ++i) {
-    crunchesPerson.encode(value, crunchesView);
+    crunchesPerson.encode(value, crunchesView, 0);
   }
-  console.log('crunches\t', performance.now() - crunchesEncodeStart);
+  console.log('crunches\t', (performance.now() - crunchesEncodeStart).toFixed(2), 'ms');
 
   console.groupEnd();
 
@@ -86,16 +86,16 @@ else {
   for (let i = 0; i < N; ++i) {
     schemaPackPerson.decode(schemaPackBuffer);
   }
-  console.log('SchemaPack\t', performance.now() - schemaPackDecodeStart);
+  console.log('SchemaPack\t', (performance.now() - schemaPackDecodeStart).toFixed(2), 'ms');
 
   for (let i = 0; i < N; ++i) {
-    crunchesPerson.decode(crunchesView);
+    crunchesPerson.decode(crunchesView, {byteOffset: 0});
   }
   const crunchesDecodeStart = performance.now();
   for (let i = 0; i < N; ++i) {
-    crunchesPerson.decode(crunchesView);
+    crunchesPerson.decode(crunchesView, {byteOffset: 0});
   }
-  console.log('crunches\t', performance.now() - crunchesDecodeStart);
+  console.log('crunches\t', (performance.now() - crunchesDecodeStart).toFixed(2), 'ms');
 
   console.groupEnd();
 
