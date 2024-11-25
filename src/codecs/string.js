@@ -3,14 +3,15 @@ class StringCodec {
   static decoder = new TextDecoder();
   static encoder = new TextEncoder();
 
-  decode(view, byteOffset = 0) {
-    const length = view.getUint32(byteOffset);
+  decode(view, target = {byteOffset: 0}) {
+    const length = view.getUint32(target.byteOffset);
+    target.byteOffset += 4;
     if (0 === length) {
-      return {read: 4, value: ''};
+      return '';
     }
-    const stringView = new DataView(view.buffer, view.byteOffset + byteOffset + 4, length);
-    const value = this.constructor.decoder.decode(stringView);
-    return {read: 4 + length, value};
+    const stringView = new DataView(view.buffer, view.byteOffset + target.byteOffset, length);
+    target.byteOffset += length;
+    return this.constructor.decoder.decode(stringView);
   }
 
   encode(value, view, byteOffset = 0) {

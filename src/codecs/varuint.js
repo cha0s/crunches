@@ -1,14 +1,15 @@
 class VarUintCodec {
-  decode(view, byteOffset = 0) {
+  decode(view, target = {byteOffset: 0}) {
     let byte;
     let read = 0;
     let value = 0;
     do {
-      byte = view.getUint8(byteOffset + read);
+      byte = view.getUint8(target.byteOffset);
       value += (byte & 127) * Math.pow(2, read * 7);
       read += 1;
+      target.byteOffset += 1;
     } while (byte & 128);
-    return {read, value};
+    return value;
   }
   encode(value, view, byteOffset = 0) {
     let written = 0;

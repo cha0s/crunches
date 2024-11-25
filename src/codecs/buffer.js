@@ -1,13 +1,15 @@
 class BufferCodec {
 
-  decode(view, byteOffset = 0) {
-    const length = view.getUint32(byteOffset);
+  decode(view, target = {byteOffset: 0}) {
+    const length = view.getUint32(target.byteOffset);
+    target.byteOffset += 4;
     const value = new ArrayBuffer(length);
     if (0 === length) {
-      return {read: 4, value};
+      return value;
     }
-    new Uint8Array(value).set(new Uint8Array(view.buffer, 4 + view.byteOffset + byteOffset));
-    return {read: 4 + length, value};
+    new Uint8Array(value).set(new Uint8Array(view.buffer, view.byteOffset + target.byteOffset));
+    target.byteOffset += length;
+    return value;
   }
 
   encode(value, view, byteOffset = 0) {

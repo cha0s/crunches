@@ -9,9 +9,8 @@ class SetCodec extends ArrayCodec {
     });
   }
 
-  decode(view, byteOffset = 0) {
-    const decoded = super.decode(view, byteOffset);
-    return {read: decoded.read, value: new Set(decoded.value)};
+  decode(view, target = {byteOffset: 0}) {
+    return new Set(super.decode(view, target));
   }
 
 }

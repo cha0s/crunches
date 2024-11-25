@@ -1,6 +1,8 @@
 class Int32Codec {
-  decode(view, byteOffset = 0) {
-    return {read: 4, value: view.getInt32(byteOffset)};
+  decode(view, target = {byteOffset: 0}) {
+    const value = view.getInt32(target.byteOffset);
+    target.byteOffset += 4;
+    return value;
   }
   encode(value, view, byteOffset = 0) {
     view.setInt32(byteOffset, value);

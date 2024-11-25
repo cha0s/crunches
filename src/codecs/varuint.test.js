@@ -11,7 +11,7 @@ test('varuint', async () => {
     view = new DataView(new ArrayBuffer(codec.size(value)));
     written = codec.encode(value, view);
     expect(written).to.equal(i + 1);
-    expect(codec.decode(view)).to.deep.equal({read: written, value});
+    expect(codec.decode(view)).to.deep.equal(value);
   }
 });
 

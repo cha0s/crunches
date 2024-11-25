@@ -12,6 +12,6 @@ test('array', async () => {
   });
   const value = [1, 2, 3, 4];
   const view = new DataView(new ArrayBuffer(codec.size(value)));
-  const written = codec.encode(value, view);
-  expect(codec.decode(view)).to.deep.equal({read: written, value});
+  codec.encode(value, view);
+  expect(codec.decode(view)).to.deep.equal(value);
 });

@@ -1,6 +1,8 @@
 class Int16Codec {
-  decode(view, byteOffset = 0) {
-    return {read: 2, value: view.getInt16(byteOffset)};
+  decode(view, target = {byteOffset: 0}) {
+    const value = view.getInt16(target.byteOffset);
+    target.byteOffset += 2;
+    return value;
   }
   encode(value, view, byteOffset = 0) {
     view.setInt16(byteOffset, value);

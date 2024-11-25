@@ -3,9 +3,8 @@ import StringCodec from './string.js';
 // will coerce strings to `Date`s
 class DateCodec extends StringCodec {
 
-  decode(view, byteOffset = 0) {
-    const decoded = super.decode(view, byteOffset);
-    return {read: decoded.read, value: new Date(decoded.value)};
+  decode(view, target = {byteOffset: 0}) {
+    return new Date(super.decode(view, target));
   }
 
   encode(value, view, byteOffset = 0) {

@@ -1,6 +1,8 @@
 class Float32Codec {
-  decode(view, byteOffset = 0) {
-    return {read: 4, value: view.getFloat32(byteOffset)};
+  decode(view, target = {byteOffset: 0}) {
+    const value = view.getFloat32(target.byteOffset);
+    target.byteOffset += 4;
+    return value;
   }
   encode(value, view, byteOffset = 0) {
     view.setFloat32(byteOffset, value);

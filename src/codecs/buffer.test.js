@@ -21,10 +21,10 @@ test('buffer', async () => {
   });
   const value = new Map([[1, 'one'], [2, 'two']]);
   const mapView = new DataView(new ArrayBuffer(mapSchema.size(value)));
-  const written = mapSchema.encode(value, mapView);
+  mapSchema.encode(value, mapView);
   const bufferSchema = new Codec();
   const bufferView = new DataView(new ArrayBuffer(bufferSchema.size(mapView.buffer)));
   bufferSchema.encode(mapView.buffer, bufferView);
-  const newMapView = new DataView(bufferSchema.decode(bufferView).value);
-  expect(mapSchema.decode(newMapView)).to.deep.equal({read: written, value});
+  const newMapView = new DataView(bufferSchema.decode(bufferView));
+  expect(mapSchema.decode(newMapView)).to.deep.equal(value);
 });

@@ -1,6 +1,8 @@
 class Uint8Codec {
-  decode(view, byteOffset = 0) {
-    return {read: 1, value: view.getUint8(byteOffset)};
+  decode(view, target = {byteOffset: 0}) {
+    const value = view.getUint8(target.byteOffset);
+    target.byteOffset += 1;
+    return value;
   }
   encode(value, view, byteOffset = 0) {
     view.setUint8(byteOffset, value);

@@ -15,13 +15,12 @@ class MapCodec extends ArrayCodec {
     });
   }
 
-  decode(view, byteOffset = 0) {
-    const decoded = super.decode(view, byteOffset);
+  decode(view, target = {byteOffset: 0}) {
     const value = new Map();
-    for (const {key, value: mapValue} of decoded.value) {
+    for (const {key, value: mapValue} of super.decode(view, target)) {
       value.set(key, mapValue);
     }
-    return {read: decoded.read, value};
+    return value;
   }
 
   encode(value, view, byteOffset = 0) {

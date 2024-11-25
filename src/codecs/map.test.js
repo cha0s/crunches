@@ -19,8 +19,8 @@ test('map', async () => {
   });
   const value = new Map([[1, 'one'], [2, 'two']]);
   const view = new DataView(new ArrayBuffer(codec.size(value)));
-  const written = codec.encode(value, view);
-  expect(codec.decode(view)).to.deep.equal({read: written, value});
+  codec.encode(value, view);
+  expect(codec.decode(view)).to.deep.equal(value);
 });
 
 test('coerce map', async () => {
@@ -30,6 +30,6 @@ test('coerce map', async () => {
   });
   const value = [[1, 'one'], [2, 'two']];
   const view = new DataView(new ArrayBuffer(codec.size(value)));
-  const written = codec.encode(value, view);
-  expect(codec.decode(view)).to.deep.equal({read: written, value: new Map(value)});
+  codec.encode(value, view);
+  expect(codec.decode(view)).to.deep.equal(new Map(value));
 });

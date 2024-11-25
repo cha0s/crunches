@@ -23,19 +23,18 @@ class ObjectCodec {
     }
   }
 
-  decode(view, byteOffset = 0) {
+  decode(view, target = {byteOffset: 0}) {
     const booleanFlags = [];
     const optionalFlags = [];
     let currentBoolean = 0;
     let currentOptional = 0;
-    let read = 0;
     let {$$booleans} = this;
     const booleanBackpatches = [];
     const optionalCount = Math.ceil(this.$$optionals / 8);
     for (let i = 0; i < optionalCount; ++i) {
-      optionalFlags.push(view.getUint8(byteOffset + i));
+      optionalFlags.push(view.getUint8(target.byteOffset));
+      target.byteOffset += 1;
     }
-    read += optionalCount;
     const value = {};
     for (const {codec, key, property} of this.$$codecs) {
       if (property.optional) {
@@ -57,22 +56,20 @@ class ObjectCodec {
         booleanBackpatches.push({bit, index, key});
       }
       else {
-        const decoded = codec.decode(view, byteOffset + read);
-        value[key] = decoded.value;
-        read += decoded.read;
+        value[key] = codec.decode(view, target);
       }
     }
     const booleanCount = Math.ceil($$booleans / 8);
     if (booleanCount > 0) {
       for (let i = 0; i < booleanCount; ++i) {
-        booleanFlags.push(view.getUint8(byteOffset + read + i));
+        booleanFlags.push(view.getUint8(target.byteOffset));
+        target.byteOffset += 1;
       }
       for (const {bit, index, key} of booleanBackpatches) {
         value[key] = !!(booleanFlags[index] & (1 << bit));
       }
-      read += booleanCount;
     }
-    return {read, value};
+    return value;
   }
 
   encode(value, view, byteOffset = 0) {

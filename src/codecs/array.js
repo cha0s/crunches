@@ -13,17 +13,14 @@ class ArrayCodec {
     this.$$elementCodec = new Codecs[blueprint.element.type](blueprint.element);
   }
 
-  decode(view, byteOffset = 0) {
-    let read = 0;
-    const length = view.getUint32(byteOffset);
-    read += 4;
+  decode(view, target = {byteOffset: 0}) {
+    const length = view.getUint32(target.byteOffset);
+    target.byteOffset += 4;
     const value = Array(length);
     for (let i = 0; i < length; ++i) {
-      const decoded = this.$$elementCodec.decode(view, byteOffset + read);
-      value[i] = decoded.value;
-      read += decoded.read;
+      value[i] = this.$$elementCodec.decode(view, target);
     }
-    return {read, value};
+    return value;
   }
 
   encode(value, view, byteOffset = 0) {

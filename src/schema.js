@@ -12,8 +12,8 @@ class Schema {
     this.$$codec = new Codecs[blueprint.type](blueprint);
   }
 
-  decode(view, byteOffset = 0) {
-    return this.$$codec.decode(view, byteOffset);
+  decode(view, target = {byteOffset: 0}) {
+    return this.$$codec.decode(view, target);
   }
 
   encode(value, view, byteOffset = 0) {

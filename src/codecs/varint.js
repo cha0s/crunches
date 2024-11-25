@@ -1,10 +1,10 @@
 import VarUintCodec from './varuint.js';
 
 class VarIntCodec extends VarUintCodec {
-  decode(view, byteOffset = 0) {
-    const decoded = super.decode(view, byteOffset);
-    const half = Math.floor(decoded.value / 2);
-    return {read: decoded.read, value: decoded.value & 1 ? -half - 1 : half};
+  decode(view, target = {byteOffset: 0}) {
+    const varuint = super.decode(view, target);
+    const half = Math.floor(varuint / 2);
+    return varuint & 1 ? -half - 1 : half;
   }
   encode(value, view, byteOffset = 0) {
     value *= 2;

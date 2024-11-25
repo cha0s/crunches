@@ -156,8 +156,8 @@ You may define your own codecs that handle encoding and decoding values. There i
 ```js
 class YourCodec {
 
-  // return the number of bytes read and the value
-  decode(view: DataView, byteOffset = 0): {read: number, value: any}
+  // return the value
+  decode(view: DataView, target: {byteOffset: number}): any
 
   // return the number of bytes written
   encode(value: any, view: DataView, byteOffset = 0): number
@@ -175,11 +175,11 @@ import {Codecs} from 'crunches';
 // will coerce strings to `Date`s
 class MyDateCodec extends Codecs.string {
 
-  decode(view, byteOffset = 0) {
+  decode(view, target) {
     // let the `string` codec decode the string
-    const decoded = super.decode(view, byteOffset);
+    const decoded = super.decode(view, target);
     // pass it to the `Date` constructor
-    return {read: decoded.read, value: new Date(decoded.value)};
+    return new Date(decoded);
   }
 
   encode(value, view, byteOffset = 0) {
@@ -202,6 +202,8 @@ Codecs.myDate = MyDateCodec;
 ```
 
 All this codec does is coerce `Date`s to and from strings. It leans on the built-in `string` codec to handle the actual over-the-wire encoding and string size calculation.
+
+Inside your codec, you must increment `target.byteOffset` as you decode bytes.
 
 Just set a key on the `Codecs` object and go. Too easy!
 
@@ -335,3 +337,6 @@ SchemaPack's `varint` types only work up to $2^{30}-1$ whereas `crunches` uses m
 
 **Q**: Why no TypeScript support?  
 **A**: Feel free to create an issue.
+
+**Q**: This library isn't **always** faster than SchemaPack!  
+**A**: That's true, at least for now. SchemaPack does a lot of black magic and compiles codecs on-the-fly. However, it is consistently faster when using larger aggregate types even in its current state.
