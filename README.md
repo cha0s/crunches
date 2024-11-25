@@ -74,7 +74,7 @@ In this example, the size of payload is only **24 bytes**. `JSON.stringify` woul
 
 It is also frequently desirable to preallocate and reuse buffers for performance reasons. SchemaPack always allocates new buffers when encoding. The performance hit is generally less than the naive case since Node is good about buffer pooling, but performance degrades in the browser (and doesn't exist on any other platform). Buffer reuse is the Correct Way™. Even with Node's pooling, we are still roughly **twice as fast as SchemaPack**. (We could probably get even faster if we did crazy stuff like compiled unrolled codecs like SchemaPack does. PRs along those lines would be interesting if there's big gains! :muscle:)
 
-I also wanted an implementation that does amazing things like [boolean coalesence](#boolean-coalescence) and [optional fields](#optional-fields) (also with [coalesence](#optional-field-coalescence)) as well as supporting more even more types like `Map`s, `Set`s, `Date`s, etc.
+I also wanted an implementation that does amazing things like [boolean coalescence](#boolean-coalescence) and [optional fields](#optional-fields) (also with [coalescence](#optional-field-coalescence)) as well as supporting more even more types like `Map`s, `Set`s, `Date`s, etc.
 
 ## :fire: features
 
