@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/cha0s/crunches/compare/crunches-v1.0.0...crunches-v1.1.0) (2024-11-25)
+
+
+### Features
+
+* varint ([e986f28](https://github.com/cha0s/crunches/commit/e986f287c798078438272e0d614020cd7f47727e))
+
 ## [1.0.0](https://github.com/cha0s/crunches/compare/crunches-v0.0.1...crunches-v1.0.0) (2024-11-24)
 
 
