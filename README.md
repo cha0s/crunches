@@ -311,11 +311,11 @@ When defining arrays, the elements are all the same type. There is no mixing of 
 
 No validation is done on the values you encode. If you'd like to validate your values, try something like [Zod](https://github.com/colinhacks/zod#basic-usage).
 
-## Blueprint verbosity
+### Blueprint verbosity
 
 Defining schema blueprints are slightly more verbose than SchemaPack. The tradeoff is that we're able to define more aggregate types like `Set`, `Map`, and maybe others in the future. While technically possible to allow e.g. a `Map` object in a blueprint, it would be even more cumbersome in my opinion.
 
-## Varint expansion
+### Varint expansion
 
 SchemaPack's `varint` types only work up to $2^{30}-1$ whereas `crunches` uses mathematical transformations (instead of bitwise) to allow numbers up to [`Number.MAX_SAFE_INTEGER`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER). In practice, due to sacrificing space for the length flags, this is $2^{48}-1$. Same goes for `varuint`: $2^{31}-1$ vs. $2^{49}-1$.
 
