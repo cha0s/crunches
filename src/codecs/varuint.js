@@ -1,13 +1,15 @@
+const stride = Math.pow(2, 7);
+
 class VarUintCodec {
   decode(view, target) {
     let byte;
-    let read = 0;
+    let read = 1;
     let value = 0;
     do {
       byte = view.getUint8(target.byteOffset);
-      value += (byte & 127) * Math.pow(2, read * 7);
-      read += 1;
       target.byteOffset += 1;
+      value += (byte & 127) * read;
+      read *= stride;
     } while (byte & 128);
     return value;
   }
