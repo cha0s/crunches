@@ -9,7 +9,7 @@ class StringCodec {
     if (0 === length) {
       return '';
     }
-    const stringView = new DataView(view.buffer, view.byteOffset + target.byteOffset, length);
+    const stringView = new Uint8Array(view.buffer, view.byteOffset + target.byteOffset, length);
     target.byteOffset += length;
     return this.constructor.decoder.decode(stringView);
   }
