@@ -340,7 +340,16 @@ SchemaPack's `varint` types only work up to $2^{30}-1$ whereas `crunches` uses m
 
 ### Varuint prefixes
 
-SchemaPack uses `varuint` prefixes for arrays, buffers, and strings. For speed, `crunches` uses 32-bit prefixes by default. A `varuint` prefix may be used for buffers and strings by providing a `varuint` key in the schema blueprint.
+SchemaPack uses `varuint` prefixes for arrays, buffers, and strings. For speed, `crunches` uses 32-bit prefixes by default. A `varuint` prefix may be used for buffers and strings by providing a `varuint` key in the schema blueprint:
+
+```js
+const schema = new Schema({
+  type: 'string',
+  varuint: true,
+});
+// 6 = varuint prefix (1) + 'hello' (5)
+console.log(schema.size('hello'));
+```
 
 **NOTE:** Strings may use one extra byte to encode the prefix than necessary. This is because [`string.length * 3`](https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder/encodeInto#buffer_sizing) is used to calculate the width of the `varuint` prefix. This expression will most likely overestimate the space required to store the string. One byte of space in certain cases is a better tradeoff than the space/time complexity required to calculate the true size in a performant way.
 
