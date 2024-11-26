@@ -56,7 +56,6 @@ class ObjectCodec {
         encoderCode += '}';
       }
       this.$$codecs.push({codec, key, property});
-      this.$$flatCodecs
       i += 1;
     }
     if (this.$$booleans > 0) {
