@@ -118,8 +118,16 @@ class ObjectCodec {
       return written;
     `;
     decoderCode += 'return value';
-    this.decode = new Function('view, target', decoderCode);
-    this.encode = new Function('value, view, byteOffset', encoderCode);
+    this.$$decode = new Function('view, target', decoderCode);
+    this.$$encode = new Function('value, view, byteOffset', encoderCode);
+  }
+
+  decode(view, target) {
+    return this.$$decode(view, target);
+  }
+
+  encode(value, view, byteOffset) {
+    return this.$$encode(value, view, byteOffset);
   }
 
   size(value) {
