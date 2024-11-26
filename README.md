@@ -74,6 +74,8 @@ It is also frequently desirable to preallocate and reuse buffers for performance
 
 I also wanted an implementation that does amazing things like [boolean coalescence](#boolean-coalescence) and [optional fields](#optional-fields) (also with [coalescence](#optional-field-coalescence)) as well as supporting more even more types like `Map`s, `Set`s, `Date`s, etc.
 
+If you're interested in the major differences between `crunches` and SchemaPack, see [notable differences from SchemaPack](#notable-differences-from-schemapack).
+
 ## :fire: features
 
 ### Boolean coalescence
@@ -334,7 +336,7 @@ A similar performance gain is also used for arrays. The fast path is used for ar
 - `float32`
 - `float64`
 
-Instead of copying the data from the buffer, a [`TypedArray`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays#typed_array_views) is created over the encoded binary and returned instead. The same optimization is applied for encoding. This optimization nets a gain of roughly **1.5x** speed for encoding and ***50x*** speed for decoding on the machine used to benchmark.
+Instead of copying the data from the buffer, a [`TypedArray`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays#typed_array_views) is created over the encoded binary and returned instead. The same optimization is applied for encoding. This is roughly **1.5x** faster for encoding and ***50x*** faster for decoding a 1024-byte array on the machine used to benchmark. The gains increase even more as the size of the array increases.
 
 **NOTE:** `float64` arrays are padded with an extra 4 bytes after the length prefix to satisfy the required 8-byte alignment.
 
