@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.1](https://github.com/cha0s/crunches/compare/crunches-v1.4.0...crunches-v1.4.1) (2024-11-26)
+
+
+### Bug Fixes
+
+* bad iterator report ([2b4ce4e](https://github.com/cha0s/crunches/commit/2b4ce4ef237d66e151e6651b12cf52ec7a2bfbdd))
+* let starved fixed-length arrays throw on encoding ([5354ef1](https://github.com/cha0s/crunches/commit/5354ef1cc82466b5328257f5caba981fe8ee2c17))
+
 ## [1.4.0](https://github.com/cha0s/crunches/compare/crunches-v1.3.0...crunches-v1.4.0) (2024-11-26)
 
 
