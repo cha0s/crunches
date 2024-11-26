@@ -2,7 +2,7 @@
 
 # crunches :muscle: 
 
-The (as of the time of writing this) smallest **and** fastest JavaScript value serialization library in the wild. **2.64 kB** gzipped; **0 dependencies**. Efficiently encode and decode your values to and from `ArrayBuffer`s. Integrates very well with WebSockets.
+The smallest **and** fastest JavaScript web standards value serialization library in the wild. **3.06 kB** gzipped; **0 dependencies**. Efficiently encode and decode your values to and from `ArrayBuffer`s. Integrates very well with WebSockets.
 
 ## Example
 
@@ -205,7 +205,7 @@ Inside your codec, you must increment `target.byteOffset` as you decode bytes.
 
 Just set a key on the `Codecs` object and go. Too easy!
 
-## Schema types
+## Primitive types
 
 | Type Name | Bytes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Range of Values                                                                                        |
 |-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
@@ -224,9 +224,9 @@ Just set a key on the `Codecs` object and go. Too easy!
 | varint    | <table><tr><th>size</th><th>min</th><th>max</th></tr><tr><td>1</td><td>-64</td><td>63</td></tr><tr><td>2</td><td>-8,192</td><td>8,191</td></tr><tr><td>3</td><td>-1,048,576</td><td>1,048,575</td></tr><tr><td>4</td><td>-134,217,728</td><td>134,217,727</td></tr><tr><td>5</td><td>-17,179,869,184</td><td>17,179,869,183</td></tr><tr><td>6</td><td>-2,199,023,255,552</td><td>2,199,023,255,551</td></tr><tr><td>7</td><td>-281,474,976,710,656</td><td>281,474,976,710,655</td></tr></table> | -281,474,976,710,656 to 281,474,976,710,655                                                            |
 | date      | Same as `string` above after calling [`toIsoString`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)                                                                                                                                                                                                                                                                                                                                           | Value is coerced to `Date` e.g. `new Date(value).toIsoString()`                                        |
 
-### Aggregate types
+## Aggregate types
 
-#### `object`
+### `object`
 
 Requires a `properties` key to define the properties on the object. Supports [`optional` fields](#optional-fields). Booleans are [coalesced](#boolean-coalescence).
 
@@ -247,7 +247,7 @@ console.log(schema.size({foo: 32, bar: 'hello'}));
 console.log(schema.size({foo: 32}));
 ```
 
-#### `array`
+### `array`
 
 Requires an `element` key to define the structure of the array elements. Encodes a 32-bit prefix followed by the contents of the array.
 
@@ -261,9 +261,26 @@ const schema = new Schema({
 console.log(schema.size([1, 2, 3]));
 ```
 
-[Arrays of number types decode to the corresponding `TypedArray`](#buffers-and-arrays).
+Arrays of number types decode to [the corresponding `TypedArray`](#buffers-and-arrays).
 
-#### `map`
+#### Fixed-length arrays
+
+Arrays may be specified as fixed-length through the `length` key.
+
+```js
+const schema = new Schema({
+  type: 'array',
+  element: {type: 'uint32'},
+  length: 3,
+});
+
+// 12 = uint32 (4) + uint32 (4) + uint32 (4)
+console.log(schema.size([1, 2, 3]));
+```
+
+No prefix is written, saving 4 bytes!
+
+### `map`
 
 Requires a `key` and `value` key to define the structure of the map. Any [iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) will be coerced as [entries](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/Map#iterable). Encoded as an array of entries. Decodes to a native `Map` object.
 
@@ -284,7 +301,7 @@ console.log(schema.size(value));
 console.log(schema.size([[32, 'sup'], [64, 'hi']]));
 ```
 
-#### `set`
+### `set`
 
 Requires an `element` key to define the structure of the map. Any [iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) will be coerced. Encoded as an array. Decodes to a native `Set` object.
 
@@ -315,7 +332,7 @@ No validation is done on the values you encode. If you'd like to validate your v
 
 ### Blueprint verbosity
 
-Defining schema blueprints are slightly more verbose than SchemaPack. The tradeoff is that we're able to define more aggregate types like `Set`, `Map`, and maybe others in the future. While technically possible to allow e.g. a `Map` object in a blueprint, it would be even more cumbersome in my opinion.
+Defining schema blueprints are slightly more verbose than SchemaPack. The tradeoff is that we're able to define more aggregate types like `Set`, `Map`, fixed-length arrays, and have made space for even more in the future.
 
 ### Varint expansion
 
@@ -342,12 +359,12 @@ Instead of copying the data from the buffer, a [`TypedArray`](https://developer.
 
 # TODO
 
-- Fixed-length arrays
 - Coalescence for boolean arrays?
 - Sparse arrays/optional elements?
 - Type aliases?
 - BigInts?
 - Endianness?
+- Optional varuint for array/buffer/string prefixes
 
 # Q/A
 
@@ -358,4 +375,4 @@ Instead of copying the data from the buffer, a [`TypedArray`](https://developer.
 **A**: Feel free to contribute typing!
 
 **Q**: How fast is it, overall?  
-**A**: Benchmarks are generally dubious in my opinion, but the `benchmark.js` script included in the repository runs 50,000 iterations of both SchemaPack and `crunches` encoding and decoding a schema. SchemaPack validation is disabled, to be as fair as possible. On the machine used to benchmark, `crunches` runs consistently **3-4x faster** than SchemaPack.
+**A**: Benchmarks are generally dubious in my opinion, but the `benchmark.js` script included in the repository runs 50,000 iterations of both SchemaPack and `crunches` encoding and decoding a schema. SchemaPack validation is disabled, to be as fair as possible. On the machine used to benchmark, `crunches` runs consistently **2-4x faster** than SchemaPack.

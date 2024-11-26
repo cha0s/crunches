@@ -1,7 +1,7 @@
 import {expect, test} from 'vitest';
 
 import {Codecs} from '../codecs.js';
-import Codec from './array.js';
+import Codec, {paddingForType, typeToElementClass} from './array.js';
 import Uint8Codec from './uint8.js';
 import Int8Codec from './int8.js';
 import Int16Codec from './int16.js';
@@ -38,8 +38,11 @@ for (const numberType of [
       element: {type: numberType},
     });
     const value = [1, 2, 3, 4];
-    const view = new DataView(new ArrayBuffer(codec.size(value)));
-    codec.encode(value, view, 0);
+    const ElementClass = typeToElementClass(numberType);
+    const size = codec.size(value);
+    expect(size).to.equal(4 + paddingForType(numberType) + ElementClass.BYTES_PER_ELEMENT * 4);
+    const view = new DataView(new ArrayBuffer(size));
+    expect(codec.encode(value, view, 0)).to.equal(size);
     expect(Array.from(codec.decode(view, {byteOffset: 0}))).to.deep.equal(value);
   });
 }
@@ -52,4 +55,57 @@ test('string array', async () => {
   const view = new DataView(new ArrayBuffer(codec.size(value)));
   codec.encode(value, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
+});
+
+test('fixed-length uint8 array', async () => {
+  const codec = new Codec({
+    element: {type: 'uint8'},
+    length: 4,
+  });
+  const value = [1, 2, 3, 4];
+  const size = codec.size(value);
+  expect(size).to.equal(4);
+  const view = new DataView(new ArrayBuffer(size));
+  expect(codec.encode(value, view, 0)).to.equal(size);
+  expect(Array.from(codec.decode(view, {byteOffset: 0}))).to.deep.equal(value);
+});
+
+test('fixed-length float64 array', async () => {
+  const codec = new Codec({
+    element: {type: 'float64'},
+    length: 4,
+  });
+  const value = [1, 2, 3, 4];
+  const size = codec.size(value);
+  expect(size).to.equal(32);
+  const view = new DataView(new ArrayBuffer(size));
+  expect(codec.encode(value, view, 0)).to.equal(size);
+  expect(Array.from(codec.decode(view, {byteOffset: 0}))).to.deep.equal(value);
+});
+
+test('fixed-length string array', async () => {
+  const codec = new Codec({
+    element: {type: 'string'},
+    length: 4,
+  });
+  const value = ['one', 'two', 'three', 'four'];
+  const size = codec.size(value);
+  expect(size).to.equal(value.reduce((size, string) => size + 4 + string.length, 0));
+  const view = new DataView(new ArrayBuffer(size));
+  expect(codec.encode(value, view, 0)).to.equal(size);
+  expect(Array.from(codec.decode(view, {byteOffset: 0}))).to.deep.equal(value);
+});
+
+test('fixed-length string drop', async () => {
+  const length = 3;
+  const codec = new Codec({
+    element: {type: 'string'},
+    length,
+  });
+  const value = ['one', 'two', 'three', 'four'];
+  const size = codec.size(value);
+  expect(size).to.equal(value.slice(0, length).reduce((size, string) => size + 4 + string.length, 0));
+  const view = new DataView(new ArrayBuffer(size));
+  expect(codec.encode(value, view, 0)).to.equal(size);
+  expect(Array.from(codec.decode(view, {byteOffset: 0}))).to.deep.equal(value.slice(0, length));
 });
