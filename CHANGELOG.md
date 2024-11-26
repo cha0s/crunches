@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/cha0s/crunches/compare/crunches-v1.2.1...crunches-v1.3.0) (2024-11-26)
+
+
+### Performance Improvements
+
+* array codec ([a72404b](https://github.com/cha0s/crunches/commit/a72404ba7d307b421d9b567d7d5fc0c06ed64eab))
+
+
+### Miscellaneous Chores
+
+* doc ([1913a4c](https://github.com/cha0s/crunches/commit/1913a4c9099c5471d741baca6bd01e575d8cb131))
+
 ## [1.2.1](https://github.com/cha0s/crunches/compare/crunches-v1.2.0...crunches-v1.2.1) (2024-11-25)
 
 
