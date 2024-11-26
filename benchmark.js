@@ -18,12 +18,12 @@ else {
 
   const blueprint = {
     properties: {
-      name: {type: 'string'},
+      name: {type: 'string', varuint: true},
       age: {type: 'uint8'},
       weight: {type: 'float32'},
       likes: {element: {type: 'uint8'}, type: 'array'},
       varints: {element: {type: 'varuint'}, type: 'array'},
-      opaque: {type: 'buffer'},
+      opaque: {type: 'buffer', varuint: true},
     },
     type: 'object',
   };
