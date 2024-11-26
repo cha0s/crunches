@@ -66,7 +66,7 @@ class ArrayCodec {
         view.buffer,
         view.byteOffset + byteOffset + written + paddingForType(this.$$type)
       ).set(new ElementClass(value));
-      written += ElementClass.BYTES_PER_ELEMENT * length;
+      written += paddingForType(this.$$type) + ElementClass.BYTES_PER_ELEMENT * length;
     }
     else {
       for (const element of value) {
