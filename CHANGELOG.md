@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.4.0](https://github.com/cha0s/crunches/compare/crunches-v1.3.0...crunches-v1.4.0) (2024-11-26)
+
+
+### Features
+
+* fixed-length arrays ([a10e37d](https://github.com/cha0s/crunches/commit/a10e37d57f4e2db080c5cdfd357d8c9024fa9585))
+* optional varuint prefixes ([2d4702b](https://github.com/cha0s/crunches/commit/2d4702b1386bd409c4f4988b5889ad834f2fa61a))
+
+
+### Bug Fixes
+
+* count padding as written ([7e28ddf](https://github.com/cha0s/crunches/commit/7e28ddf3bcf517a22d759161744b224ec25d2518))
+* object prototype ([75f0e9d](https://github.com/cha0s/crunches/commit/75f0e9d558470aacec691ec91716ad338f152b15))
+* string size calc ([e3f4c5e](https://github.com/cha0s/crunches/commit/e3f4c5ef7b95dc71fb0682dbdc197e43214d3d0f))
+
 ## [1.3.0](https://github.com/cha0s/crunches/compare/crunches-v1.2.1...crunches-v1.3.0) (2024-11-26)
 
 
