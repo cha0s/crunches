@@ -21,23 +21,14 @@ class ObjectCodec {
       if (property.optional) {
         this.$$optionals += 1;
         decoderCode += `
-          index = currentOptional >> 3;
-          bit = currentOptional & 7;
-          currentOptional += 1;
-          if (!(optionalFlags[index] & (1 << bit))) {
-            ${
-              'bool' === property.type
-              ? '$$booleans -= 1'
-              : ''
-            }
+          if (!(optionalFlags[currentOptional >> 3] & (1 << (currentOptional & 7)))) {
+            ${'bool' === property.type ? '$$booleans -= 1' : ''}
           }
           else {
         `;
         encoderCode += `
-          index = currentOptional >> 3;
-          bit = currentOptional & 7;
           isPresent = 'undefined' !== typeof value['${key}'];
-          optionalFlags[index] |= (isPresent ? 1 : 0) << bit;
+          optionalFlags[currentOptional >> 3] |= (isPresent ? 1 : 0) << (currentOptional & 7);
           currentOptional += 1;
           if (isPresent) {
         `;
@@ -45,15 +36,11 @@ class ObjectCodec {
       if ('bool' === property.type) {
         this.$$booleans += 1;
         decoderCode += `
-          index = currentBoolean >> 3;
-          bit = currentBoolean & 7;
+          booleanBackpatches.push({bit: currentBoolean & 7, index: currentBoolean >> 3, key: '${key}'});
           currentBoolean += 1;
-          booleanBackpatches.push({bit, index, key: '${key}'});
         `;
         encoderCode += `
-          index = currentBoolean >> 3;
-          bit = currentBoolean & 7;
-          booleanFlags[index] |= (value['${key}'] ? 1 : 0) << bit;
+          booleanFlags[currentBoolean >> 3] |= (value['${key}'] ? 1 : 0) << (currentBoolean & 7);
           currentBoolean += 1;
         `;
       }
@@ -62,7 +49,10 @@ class ObjectCodec {
         encoderCode += `written += this.$$codecs[${i}].codec.encode(value['${key}'], view, byteOffset + written);`;
       }
       if (property.optional) {
-        decoderCode += '}';
+        decoderCode += `
+          }
+          currentOptional += 1;
+        `;
         encoderCode += '}';
       }
       this.$$codecs.push({codec, key, property});
@@ -120,14 +110,6 @@ class ObjectCodec {
         let isPresent;
         written += Math.ceil(this.$$optionals / 8);
       ` + encoderCode
-    }
-    if (this.$$optionals > 0 || this.$$booleans > 0) {
-      decoderCode = `
-        let bit, index;
-      ` + decoderCode;
-      encoderCode = `
-        let bit, index;
-      ` + encoderCode;
     }
     encoderCode = `
       let written = 0;
