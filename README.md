@@ -332,7 +332,7 @@ No validation is done on the values you encode. If you'd like to validate your v
 
 ### Blueprint verbosity
 
-Defining schema blueprints are slightly more verbose than SchemaPack. The tradeoff is that we're able to define more aggregate types like `Set`, `Map`, fixed-length arrays, and have made space for even more in the future.
+Defining schema blueprints are slightly more verbose than SchemaPack. The tradeoff is that we're able to define more aggregate types like `Set`, `Map`, fixed-length arrays, optional `varuint` prefixes, and have made space for even more in the future.
 
 ### Varint expansion
 
