@@ -31,7 +31,7 @@ class StringCodec {
   }
 
   size(value) {
-    return 4 + (this.constructor.encoder.encode(value)).length;
+    return this.$$prefix.size(value.length * 3) + (this.constructor.encoder.encode(value)).length;
   }
 
 }
