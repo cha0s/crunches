@@ -109,3 +109,15 @@ test('fixed-length string drop', async () => {
   expect(codec.encode(value, view, 0)).to.equal(size);
   expect(Array.from(codec.decode(view, {byteOffset: 0}))).to.deep.equal(value.slice(0, length));
 });
+
+test('fixed-length string starved', async () => {
+  const length = 3;
+  const codec = new Codec({
+    element: {type: 'string'},
+    length,
+  });
+  const value = ['one', 'two'];
+  expect(() => codec.size(value)).toThrowError();
+  const view = new DataView(new ArrayBuffer(1024));
+  expect(() => codec.encode(value, view, 0)).toThrowError();
+});

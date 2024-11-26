@@ -121,7 +121,7 @@ class ArrayCodec {
         }
         let protocol = value[Symbol.iterator]();
         let result = protocol.next();
-        for (let i = 0; !result.done && i < ${length}; ++i) {
+        for (let i = 0; i < ${length}; ++i) {
           written += this.$$elementCodec.encode(result.value, view, byteOffset + written);
           result = protocol.next();
         }
@@ -144,7 +144,7 @@ class ArrayCodec {
           }
           let protocol = value[Symbol.iterator]();
           let result = protocol.next();
-          for (let i = 0; !result.done && i < length; ++i) {
+          for (let i = 0; i < length; ++i) {
             size += this.$$elementCodec.size(result.value);
             result = protocol.next();
           }
