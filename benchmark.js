@@ -37,17 +37,17 @@ else {
     opaque: 'buffer',
   };
 
-  const opaque = Buffer.alloc(512);
+  const opaque = Buffer.alloc(1024);
 
   const value = {
     name: 'John Smith',
     age: 32,
     weight: 188.5,
-    likes: Array(512).fill(0),
-    varints: Array(512).fill(0),
+    likes: Array(1024).fill(0),
+    varints: Array(1024).fill(0),
   };
 
-  const N = 10000;
+  const N = 50000;
 
   console.group('encoding x', N);
 
