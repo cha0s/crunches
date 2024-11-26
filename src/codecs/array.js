@@ -117,7 +117,7 @@ class ArrayCodec {
       encoderCode += `
         // let the environment report
         if (!value[Symbol.iterator]) {
-          for (const _ of {}) {/* ... */} // eslint-disable-line no-unused-vars
+          for (const _ of value) {/* ... */} // eslint-disable-line no-unused-vars
         }
         let protocol = value[Symbol.iterator]();
         let result = protocol.next();
@@ -140,7 +140,7 @@ class ArrayCodec {
           let size = 0;
           // let the environment report
           if (!value[Symbol.iterator]) {
-            for (const _ of {}) {/* ... */} // eslint-disable-line no-unused-vars
+            for (const _ of value) {/* ... */} // eslint-disable-line no-unused-vars
           }
           let protocol = value[Symbol.iterator]();
           let result = protocol.next();
