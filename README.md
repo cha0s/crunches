@@ -2,7 +2,7 @@
 
 # crunches :muscle: 
 
-The smallest **and** fastest JavaScript web standards-compliant value serialization library in the wild. **3.24 kB** gzipped; **0 dependencies**. Efficiently encode and decode your values to and from `ArrayBuffer`s. Integrates very well with WebSockets.
+The smallest **and** fastest JavaScript web standards-compliant value serialization library in the wild. **3.36 kB** gzipped; **0 dependencies**. Efficiently encode and decode your values to and from `ArrayBuffer`s. Integrates very well with WebSockets.
 
 ## Example
 
