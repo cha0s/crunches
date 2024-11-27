@@ -66,6 +66,28 @@ socket.on('player-data', (buffer) => {
 
 In this example, the size of payload is only **22 bytes**. `JSON.stringify` would consume **124 bytes**.
 
+**NOTE:** There is a convenience method `Schema::allocate(value)` which will allocate a view over a buffer sized to hold your value. Above, we did:
+
+```js
+// get the schema size
+const size = playerSchema.size(player);
+// allocate a buffer
+const buffer = new ArrayBuffer(size);
+// create a view over the buffer
+const view = new DataView(buffer);
+// pass the view to the encoder
+const written = playerSchema.encode(player, view);
+```
+
+This could be written equivalently as:
+
+```js
+// create a view for our value
+const view = playerSchema.allocate(player);
+// pass the view to the encoder
+const written = playerSchema.encode(player, view);
+```
+
 ## Motivation
 
 [SchemaPack](https://github.com/phretaddin/schemapack/tree/master) (huge respect from and inspiration for this library! :heart:) is great for packing objects into Node buffers. Over time, this approach has become outdated in favor of modern standards like `ArrayBuffer`.

@@ -9,6 +9,10 @@ class Schema {
     this.$$codec = resolveCodec(blueprint);
   }
 
+  allocate(value) {
+    return new DataView(new ArrayBuffer(this.size(value)));
+  }
+
   decode(view, target = {byteOffset: 0}) {
     return this.$$codec.decode(view, target);
   }

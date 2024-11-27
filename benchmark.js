@@ -65,13 +65,13 @@ else {
 
   const crunchesPerson = new Schema(blueprint);
   value.opaque = opaque.buffer;
-  const crunchesView = new DataView(new ArrayBuffer(crunchesPerson.size(value)));
+  const crunchesView = crunchesPerson.allocate(value);
   for (let i = 0; i < N; ++i) {
-    crunchesPerson.encode(value, crunchesView, 0);
+    crunchesPerson.encode(value, crunchesView);
   }
   const crunchesEncodeStart = performance.now();
   for (let i = 0; i < N; ++i) {
-    crunchesPerson.encode(value, crunchesView, 0);
+    crunchesPerson.encode(value, crunchesView);
   }
   console.log('crunches\t', (performance.now() - crunchesEncodeStart).toFixed(2), 'ms');
 
@@ -89,11 +89,11 @@ else {
   console.log('SchemaPack\t', (performance.now() - schemaPackDecodeStart).toFixed(2), 'ms');
 
   for (let i = 0; i < N; ++i) {
-    crunchesPerson.decode(crunchesView, {byteOffset: 0});
+    crunchesPerson.decode(crunchesView);
   }
   const crunchesDecodeStart = performance.now();
   for (let i = 0; i < N; ++i) {
-    crunchesPerson.decode(crunchesView, {byteOffset: 0});
+    crunchesPerson.decode(crunchesView);
   }
   console.log('crunches\t', (performance.now() - crunchesDecodeStart).toFixed(2), 'ms');
 
