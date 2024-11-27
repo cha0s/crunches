@@ -2,7 +2,7 @@ import {expect, test} from 'vitest';
 
 import {Codecs} from '../codecs.js';
 import Codec from './object.js';
-import BoolCodec from './uint8.js';
+import BoolCodec from './bool.js';
 import Uint8Codec from './uint8.js';
 
 Codecs.bool = BoolCodec;
@@ -17,7 +17,7 @@ test('object', async () => {
     },
   });
   const view = new DataView(new ArrayBuffer(codec.size({1: 32, 2: 32})));
-  codec.encode({1: 32, 2: 32}, view, 0);
+  expect(codec.encode({1: 32, 2: 32}, view, 0)).to.equal(2);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal({1: 32, 2: 32});
 });
 
@@ -33,6 +33,24 @@ test('object boolean coalescence', async () => {
   expect(codec.size(value)).to.equal(1);
   for (let i = 8; i < 16; ++i) {
     blueprint.properties[i] = {type: 'bool'};
+    value[i] = i;
+  }
+  codec = new Codec(blueprint);
+  expect(codec.size(value)).to.equal(2);
+});
+
+test('object aliased boolean coalescence', async () => {
+  let codec;
+  const blueprint = {properties: {}};
+  const value = {};
+  for (let i = 0; i < 8; ++i) {
+    blueprint.properties[i] = {type: 'boolean'};
+    value[i] = i;
+  }
+  codec = new Codec(blueprint);
+  expect(codec.size(value)).to.equal(1);
+  for (let i = 8; i < 16; ++i) {
+    blueprint.properties[i] = {type: 'boolean'};
     value[i] = i;
   }
   codec = new Codec(blueprint);

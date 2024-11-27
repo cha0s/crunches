@@ -1,4 +1,4 @@
-import {Codecs} from './codecs.js';
+import {resolveCodec} from './codecs.js';
 
 // Just an ergonomic wrapper around the root codec.
 class Schema {
@@ -6,10 +6,7 @@ class Schema {
   $$codec;
 
   constructor(blueprint) {
-    if (!(blueprint.type in Codecs)) {
-      throw new TypeError(`No such codec '${blueprint.type}'`);
-    }
-    this.$$codec = new Codecs[blueprint.type](blueprint);
+    this.$$codec = resolveCodec(blueprint);
   }
 
   decode(view, target = {byteOffset: 0}) {

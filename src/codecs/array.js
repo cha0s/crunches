@@ -1,4 +1,4 @@
-import {Codecs} from '../codecs.js';
+import {resolveCodec} from '../codecs.js';
 
 export function typeToElementClass(type) {
   switch (type) {
@@ -27,12 +27,7 @@ class ArrayCodec {
   $$elementCodec;
 
   constructor(blueprint) {
-    if (!(blueprint.element.type in Codecs)) {
-      throw new TypeError(`No such codec '${blueprint.element.type}'`);
-    }
-    // todo: throw on optional or honor and encode sparse arrays
-    // todo: boolean coalescence
-    this.$$elementCodec = new Codecs[blueprint.element.type](blueprint.element);
+    this.$$elementCodec = resolveCodec(blueprint.element);
     const {length = 0} = blueprint;
     const {type} = blueprint.element;
     const ElementClass = typeToElementClass(type);

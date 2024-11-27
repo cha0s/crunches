@@ -1,4 +1,5 @@
-import {Codecs} from '../codecs.js';
+import {resolveCodec} from '../codecs.js';
+import BoolCodec from './bool.js';
 
 class ObjectCodec {
 
@@ -14,15 +15,12 @@ class ObjectCodec {
     let i = 0;
     for (const key in blueprint.properties) {
       const property = blueprint.properties[key];
-      if (!(property.type in Codecs)) {
-        throw new TypeError(`No such codec '${property.type}'`);
-      }
-      const codec = new Codecs[property.type](property);
+      const codec = resolveCodec(property);
       if (property.optional) {
         this.$$optionals += 1;
         decoderCode += `
           if (!(optionalFlags[currentOptional >> 3] & (1 << (currentOptional & 7)))) {
-            ${'bool' === property.type ? '$$booleans -= 1' : ''}
+            ${(codec instanceof BoolCodec) ? '$$booleans -= 1' : ''}
           }
           else {
         `;
@@ -33,7 +31,7 @@ class ObjectCodec {
           if (isPresent) {
         `;
       }
-      if ('bool' === property.type) {
+      if (codec instanceof BoolCodec) {
         this.$$booleans += 1;
         decoderCode += `
           booleanBackpatches.push({bit: currentBoolean & 7, index: currentBoolean >> 3, key: '${key}'});
@@ -45,8 +43,8 @@ class ObjectCodec {
         `;
       }
       else {
-        decoderCode += `value['${key}'] = this.$$codecs[${i}].codec.decode(view, target);`;
-        encoderCode += `written += this.$$codecs[${i}].codec.encode(value['${key}'], view, byteOffset + written);`;
+        decoderCode += `value['${key}'] = this.$$codecs[${i}].decode(view, target);`;
+        encoderCode += `written += this.$$codecs[${i}].encode(value['${key}'], view, byteOffset + written);`;
       }
       if (property.optional) {
         decoderCode += `
@@ -55,7 +53,7 @@ class ObjectCodec {
         `;
         encoderCode += '}';
       }
-      this.$$codecs.push({codec, key, property});
+      this.$$codecs.push(codec);
       i += 1;
     }
     if (this.$$booleans > 0) {
@@ -119,6 +117,29 @@ class ObjectCodec {
     decoderCode += 'return value';
     this.$$decode = new Function('view, target', decoderCode);
     this.$$encode = new Function('value, view, byteOffset', encoderCode);
+    this.$$size = (value) => {
+      let {$$booleans} = this;
+      let size = 0;
+      size += Math.ceil(this.$$optionals / 8);
+      let i = 0;
+      for (const key in blueprint.properties) {
+        const codec = this.$$codecs[i];
+        const property = blueprint.properties[key];
+        if (property.optional && 'undefined' === typeof value[key]) {
+          if (codec instanceof BoolCodec) {
+            $$booleans -= 1;
+          }
+          i += 1;
+          continue;
+        }
+        if (!(codec instanceof BoolCodec)) {
+          size += codec.size(value[key]);
+        }
+        i += 1;
+      }
+      size += Math.ceil($$booleans / 8);
+      return size;
+    };
   }
 
   decode(view, target) {
@@ -130,22 +151,7 @@ class ObjectCodec {
   }
 
   size(value) {
-    let {$$booleans} = this;
-    let size = 0;
-    size += Math.ceil(this.$$optionals / 8);
-    for (const {codec, key, property} of this.$$codecs) {
-      if (property.optional && 'undefined' === typeof value[key]) {
-        if ('bool' === property.type) {
-          $$booleans -= 1;
-        }
-        continue;
-      }
-      if ('bool' !== property.type) {
-        size += codec.size(value[key]);
-      }
-    }
-    size += Math.ceil($$booleans / 8);
-    return size;
+    return this.$$size(value);
   }
 
 }
