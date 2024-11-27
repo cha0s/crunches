@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.5.0](https://github.com/cha0s/crunches/compare/crunches-v1.4.1...crunches-v1.5.0) (2024-11-27)
+
+
+### Features
+
+* (u)int64 ([bcf83f1](https://github.com/cha0s/crunches/commit/bcf83f1dc5dda6d14494ed0f06767bd3fe7381f0))
+* Schema::allocate ([91184cb](https://github.com/cha0s/crunches/commit/91184cb910de39aa985a1aa806a03df53e4a3dab))
+* type aliases ([c0c6ed2](https://github.com/cha0s/crunches/commit/c0c6ed2429be2a4afcc7314669aa32fe573ad89d))
+
 ## [1.4.1](https://github.com/cha0s/crunches/compare/crunches-v1.4.0...crunches-v1.4.1) (2024-11-26)
 
 
