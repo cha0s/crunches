@@ -22,10 +22,7 @@ class BufferCodec {
   }
 
   size(value) {
-    const prefixLength = (this.$$prefix instanceof VarUintCodec)
-      ? this.$$prefix.size(value.byteLength)
-      : 4;
-    return prefixLength + value.byteLength;
+    return this.$$prefix.size(value.byteLength) + value.byteLength;
   }
 
 }
