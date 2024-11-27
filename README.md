@@ -88,16 +88,6 @@ const view = playerSchema.allocate(player);
 const written = playerSchema.encode(player, view);
 ```
 
-## Motivation
-
-[SchemaPack](https://github.com/phretaddin/schemapack/tree/master) (huge respect from and inspiration for this library! :heart:) is great for packing objects into Node buffers. Over time, this approach has become outdated in favor of modern standards like `ArrayBuffer`.
-
-It is also frequently desirable to preallocate and reuse buffers for performance reasons. SchemaPack always allocates new buffers when encoding. The performance hit is generally less than the naive case since Node is good about buffer pooling, but performance degrades in the browser (and doesn't exist on any other platform). Buffer reuse is the Correct Way™. We also apply even more [optimizations of buffers and arrays](#buffers-and-arrays).
-
-I also wanted an implementation that does amazing things like [boolean coalescence](#boolean-coalescence) and [optional fields](#optional-fields) (also with [coalescence](#optional-field-coalescence)) as well as supporting more even more types like `Map`s, `Set`s, `Date`s, etc.
-
-If you're interested in the major differences between `crunches` and SchemaPack, see [notable differences from SchemaPack](#notable-differences-from-schemapack).
-
 ## :fire: features
 
 ### Boolean coalescence
@@ -360,6 +350,15 @@ console.log(schema.size(set));
 // same, with coercion
 console.log(schema.size(['foo', 'bar']));
 ```
+
+## Motivation
+
+[SchemaPack](https://github.com/phretaddin/schemapack/tree/master) (huge respect from and inspiration for this library! :heart:) is great for packing objects into Node buffers. Over time, this approach has become outdated in favor of modern standards like `ArrayBuffer`.
+
+It is also frequently desirable to preallocate and reuse buffers for performance reasons. SchemaPack always allocates new buffers when encoding. The performance hit is generally less than the naive case since Node is good about buffer pooling, but performance degrades in the browser (and doesn't exist on any other platform). Buffer reuse is the Correct Way™. We also apply even more [optimizations of buffers and arrays](#buffers-and-arrays).
+
+I also wanted an implementation that does amazing things like [boolean coalescence](#boolean-coalescence) and [optional fields](#optional-fields) (also with [coalescence](#optional-field-coalescence)) as well as supporting more even more types like `Map`s, `Set`s, `Date`s, etc.
+
 ## Notable differences from SchemaPack
 
 ### Monomorphic arrays
