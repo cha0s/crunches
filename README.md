@@ -88,6 +88,124 @@ const view = playerSchema.allocate(player);
 const written = playerSchema.encode(player, view);
 ```
 
+## Primitive types
+
+| Type Name             | Bytes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Range of Values                                                                                                                                                                                                |
+|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| bool (alias: boolean) | 1 (worst case, see [boolean coalescence](#boolean-coalescence))                                                                                                                                                                                                                                                                                                                                                                                                                                   | Truthy values are coerced to `true`; falsy values to `false`                                                                                                                                                   |
+| int8                  | 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | -128 to 127                                                                                                                                                                                                    |
+| uint8                 | 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 0 to 255                                                                                                                                                                                                       |
+| int16                 | 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | -32,768 to 32,767                                                                                                                                                                                              |
+| uint16                | 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 0 to 65,535                                                                                                                                                                                                    |
+| int32                 | 4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | -2,147,483,648 to 2,147,483,647                                                                                                                                                                                |
+| uint32                | 4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 0 to 4,294,967,295                                                                                                                                                                                             |
+| int64                 | 8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807<br /><br />**NOTE:** Only accepts and decodes to [`BigInt`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt)s. |
+| uint64                | 8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 0 to 18,446,744,073,709,551,615<br /><br />**NOTE:** Only accepts and decodes to [`BigInt`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt)s.                         |
+| float32               | 4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 3.4E +/- 38 (7 digits)                                                                                                                                                                                         |
+| float64               | 8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 1.7E +/- 308 (15 digits)                                                                                                                                                                                       |
+| string                | [Prefix](#varuint-prefixes) followed by the [encoded](https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder/encodeInto) string bytes                                                                                                                                                                                                                                                                                                                                                       | Any string                                                                                                                                                                                                     |
+| buffer                | [Prefix](#varuint-prefixes) followed by the bytes of the buffer                                                                                                                                                                                                                                                                                                                                                                                                                                   | Any `ArrayBuffer`<br /><br />**NOTE:** Decodes to a `DataView`.<br /><br />See: [buffers and arrays](#buffers-and-arrays).                                                                                     |
+| varuint               | <table><tr><th>size</th><th>min</th><th>max</th></tr><tr><td>1</td><td>0</td><td>127</td></tr><tr><td>2</td><td>128</td><td>16,383</td></tr><tr><td>3</td><td>16,384</td><td>2,097,151</td></tr><tr><td>4</td><td>2,097,152</td><td>268,435,455</td></tr><tr><td>5</td><td>268,435,456</td><td>34,359,738,367</td></tr><tr><td>6</td><td>34,359,738,368</td><td>4,398,046,511,103</td></tr><tr><td>7</td><td>4,398,046,511,104</td><td>562,949,953,421,311</td></tr></table>                      | 0 to 562,949,953,421,311                                                                                                                                                                                       |
+| varint                | <table><tr><th>size</th><th>min</th><th>max</th></tr><tr><td>1</td><td>-64</td><td>63</td></tr><tr><td>2</td><td>-8,192</td><td>8,191</td></tr><tr><td>3</td><td>-1,048,576</td><td>1,048,575</td></tr><tr><td>4</td><td>-134,217,728</td><td>134,217,727</td></tr><tr><td>5</td><td>-17,179,869,184</td><td>17,179,869,183</td></tr><tr><td>6</td><td>-2,199,023,255,552</td><td>2,199,023,255,551</td></tr><tr><td>7</td><td>-281,474,976,710,656</td><td>281,474,976,710,655</td></tr></table> | -281,474,976,710,656 to 281,474,976,710,655                                                                                                                                                                    |
+| date                  | Same as `string` above after calling [`toIsoString`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)                                                                                                                                                                                                                                                                                                                                           | Value is coerced to `Date` e.g. `new Date(value).toIsoString()`                                                                                                                                                |
+
+## Aggregate types
+
+### `object`
+
+Requires a `properties` key to define the properties on the object. Supports [`optional` fields](#optional-fields). Booleans are [coalesced](#boolean-coalescence).
+
+Example:
+
+```js
+const schema = new Schema({
+  type: 'object',
+  properties: {
+    foo: {type: 'uint32'},
+    bar: {type: 'string', optional: true},
+  },
+});
+
+// 14 = uint32 (4) + optional flag (1) + string prefix (4) + 'hello' (5)
+console.log(schema.size({foo: 32, bar: 'hello'}));
+// 5 = uint32 (4) + optional flag (1)
+console.log(schema.size({foo: 32}));
+```
+
+### `array`
+
+Requires an `element` key to define the structure of the array elements. Encodes a 32-bit prefix followed by the contents of the array.
+
+```js
+const schema = new Schema({
+  type: 'array',
+  element: {type: 'uint32'},
+});
+
+// 16 = array prefix (4) + uint32 (4) + uint32 (4) + uint32 (4)
+console.log(schema.size([1, 2, 3]));
+```
+
+Arrays of number types decode to [the corresponding `TypedArray`](#buffers-and-arrays).
+
+#### Fixed-length arrays
+
+Arrays may be specified as fixed-length through the `length` key.
+
+```js
+const schema = new Schema({
+  type: 'array',
+  element: {type: 'uint32'},
+  length: 3,
+});
+
+// 12 = uint32 (4) + uint32 (4) + uint32 (4)
+console.log(schema.size([1, 2, 3]));
+```
+
+No prefix is written, saving 4 bytes!
+
+### `map`
+
+Requires a `key` and `value` key to define the structure of the map. Any [iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) will be coerced as [entries](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/Map#iterable). Encoded as an array of entries. Decodes to a native `Map` object.
+
+```js
+const schema = new Schema({
+  type: 'map',
+  key: {type: 'int32'},
+  value: {type: 'string'},
+});
+
+const value = new Map();
+value.set(32, 'sup');
+value.set(64, 'hi');
+
+// 25 = array prefix (4) + int32 (4) + string prefix (4) + 'sup' (3) + int32 (4) + string prefix (4) + 'hi' (2)
+console.log(schema.size(value));
+// same, with coercion
+console.log(schema.size([[32, 'sup'], [64, 'hi']]));
+```
+
+### `set`
+
+Requires an `element` key to define the structure of the map. Any [iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) will be coerced. Encoded as an array. Decodes to a native `Set` object.
+
+```js
+const schema = new Schema({
+  type: 'set',
+  element: {type: 'string'},
+});
+
+const set = new Set();
+set.add('foo');
+set.add('bar');
+
+// 18 = array prefix (4) + string prefix (4) + 'foo' (3) + string prefix (4) + 'bar' (3)
+console.log(schema.size(set));
+// same, with coercion
+console.log(schema.size(['foo', 'bar']));
+```
+
 ## :fire: features
 
 ### Boolean coalescence
@@ -230,125 +348,7 @@ const schema = new Schema({
   type: 'foobar',
 });
 
-console.log(schema.size()); // 1, because it's a bool.
-```
-
-## Primitive types
-
-| Type Name             | Bytes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Range of Values                                                                                                                                                                                                |
-|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| bool (alias: boolean) | 1 (worst case, see [boolean coalescence](#boolean-coalescence))                                                                                                                                                                                                                                                                                                                                                                                                                                   | Truthy values are coerced to `true`; falsy values to `false`                                                                                                                                                   |
-| int8                  | 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | -128 to 127                                                                                                                                                                                                    |
-| uint8                 | 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 0 to 255                                                                                                                                                                                                       |
-| int16                 | 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | -32,768 to 32,767                                                                                                                                                                                              |
-| uint16                | 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 0 to 65,535                                                                                                                                                                                                    |
-| int32                 | 4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | -2,147,483,648 to 2,147,483,647                                                                                                                                                                                |
-| uint32                | 4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 0 to 4,294,967,295                                                                                                                                                                                             |
-| int64                 | 8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807<br /><br />**NOTE:** Only accepts and decodes to [`BigInt`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt)s. |
-| uint64                | 8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 0 to 18,446,744,073,709,551,615<br /><br />**NOTE:** Only accepts and decodes to [`BigInt`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt)s.                         |
-| float32               | 4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 3.4E +/- 38 (7 digits)                                                                                                                                                                                         |
-| float64               | 8                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 1.7E +/- 308 (15 digits)                                                                                                                                                                                       |
-| string                | [Prefix](#varuint-prefixes) followed by the [encoded](https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder/encodeInto) string bytes                                                                                                                                                                                                                                                                                                                                                       | Any string                                                                                                                                                                                                     |
-| buffer                | [Prefix](#varuint-prefixes) followed by the bytes of the buffer                                                                                                                                                                                                                                                                                                                                                                                                                                   | Any `ArrayBuffer`<br /><br />**NOTE:** Decodes to a `DataView`.<br /><br />See: [buffers and arrays](#buffers-and-arrays).                                                                                     |
-| varuint               | <table><tr><th>size</th><th>min</th><th>max</th></tr><tr><td>1</td><td>0</td><td>127</td></tr><tr><td>2</td><td>128</td><td>16,383</td></tr><tr><td>3</td><td>16,384</td><td>2,097,151</td></tr><tr><td>4</td><td>2,097,152</td><td>268,435,455</td></tr><tr><td>5</td><td>268,435,456</td><td>34,359,738,367</td></tr><tr><td>6</td><td>34,359,738,368</td><td>4,398,046,511,103</td></tr><tr><td>7</td><td>4,398,046,511,104</td><td>562,949,953,421,311</td></tr></table>                      | 0 to 562,949,953,421,311                                                                                                                                                                                       |
-| varint                | <table><tr><th>size</th><th>min</th><th>max</th></tr><tr><td>1</td><td>-64</td><td>63</td></tr><tr><td>2</td><td>-8,192</td><td>8,191</td></tr><tr><td>3</td><td>-1,048,576</td><td>1,048,575</td></tr><tr><td>4</td><td>-134,217,728</td><td>134,217,727</td></tr><tr><td>5</td><td>-17,179,869,184</td><td>17,179,869,183</td></tr><tr><td>6</td><td>-2,199,023,255,552</td><td>2,199,023,255,551</td></tr><tr><td>7</td><td>-281,474,976,710,656</td><td>281,474,976,710,655</td></tr></table> | -281,474,976,710,656 to 281,474,976,710,655                                                                                                                                                                    |
-| date                  | Same as `string` above after calling [`toIsoString`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)                                                                                                                                                                                                                                                                                                                                           | Value is coerced to `Date` e.g. `new Date(value).toIsoString()`                                                                                                                                                |
-
-## Aggregate types
-
-### `object`
-
-Requires a `properties` key to define the properties on the object. Supports [`optional` fields](#optional-fields). Booleans are [coalesced](#boolean-coalescence).
-
-Example:
-
-```js
-const schema = new Schema({
-  type: 'object',
-  properties: {
-    foo: {type: 'uint32'},
-    bar: {type: 'string', optional: true},
-  },
-});
-
-// 14 = uint32 (4) + optional flag (1) + string prefix (4) + 'hello' (5)
-console.log(schema.size({foo: 32, bar: 'hello'}));
-// 5 = uint32 (4) + optional flag (1)
-console.log(schema.size({foo: 32}));
-```
-
-### `array`
-
-Requires an `element` key to define the structure of the array elements. Encodes a 32-bit prefix followed by the contents of the array.
-
-```js
-const schema = new Schema({
-  type: 'array',
-  element: {type: 'uint32'},
-});
-
-// 16 = array prefix (4) + uint32 (4) + uint32 (4) + uint32 (4)
-console.log(schema.size([1, 2, 3]));
-```
-
-Arrays of number types decode to [the corresponding `TypedArray`](#buffers-and-arrays).
-
-#### Fixed-length arrays
-
-Arrays may be specified as fixed-length through the `length` key.
-
-```js
-const schema = new Schema({
-  type: 'array',
-  element: {type: 'uint32'},
-  length: 3,
-});
-
-// 12 = uint32 (4) + uint32 (4) + uint32 (4)
-console.log(schema.size([1, 2, 3]));
-```
-
-No prefix is written, saving 4 bytes!
-
-### `map`
-
-Requires a `key` and `value` key to define the structure of the map. Any [iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) will be coerced as [entries](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/Map#iterable). Encoded as an array of entries. Decodes to a native `Map` object.
-
-```js
-const schema = new Schema({
-  type: 'map',
-  key: {type: 'int32'},
-  value: {type: 'string'},
-});
-
-const value = new Map();
-value.set(32, 'sup');
-value.set(64, 'hi');
-
-// 25 = array prefix (4) + int32 (4) + string prefix (4) + 'sup' (3) + int32 (4) + string prefix (4) + 'hi' (2)
-console.log(schema.size(value));
-// same, with coercion
-console.log(schema.size([[32, 'sup'], [64, 'hi']]));
-```
-
-### `set`
-
-Requires an `element` key to define the structure of the map. Any [iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) will be coerced. Encoded as an array. Decodes to a native `Set` object.
-
-```js
-const schema = new Schema({
-  type: 'set',
-  element: {type: 'string'},
-});
-
-const set = new Set();
-set.add('foo');
-set.add('bar');
-
-// 18 = array prefix (4) + string prefix (4) + 'foo' (3) + string prefix (4) + 'bar' (3)
-console.log(schema.size(set));
-// same, with coercion
-console.log(schema.size(['foo', 'bar']));
+console.log(schema.size()); // 1, because it's a bool
 ```
 
 ## Motivation
