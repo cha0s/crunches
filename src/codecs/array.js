@@ -10,6 +10,8 @@ export function typeToElementClass(type) {
     case 'uint32': return Uint32Array;
     case 'float32': return Float32Array;
     case 'float64': return Float64Array;
+    case 'bigint64': return BigInt64Array;
+    case 'biguint64': return BigUint64Array;
   }
   return undefined;
 }

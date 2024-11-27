@@ -11,6 +11,8 @@ import Uint32Codec from './uint32.js';
 import Float32Codec from './float32.js';
 import Float64Codec from './float64.js';
 import StringCodec from './string.js';
+import Int64Codec from './int64.js';
+import Uint64Codec from './uint64.js';
 
 Codecs.uint8 = Uint8Codec;
 Codecs.int8 = Int8Codec;
@@ -22,6 +24,8 @@ Codecs.uint32 = Uint32Codec;
 Codecs.float32 = Float32Codec;
 Codecs.float64 = Float64Codec;
 Codecs.string = StringCodec;
+Codecs.int64 = Int64Codec;
+Codecs.uint64 = Uint64Codec;
 
 for (const numberType of [
   'int8',
@@ -46,6 +50,26 @@ for (const numberType of [
     expect(Array.from(codec.decode(view, {byteOffset: 0}))).to.deep.equal(value);
   });
 }
+
+test('int64 array', async () => {
+  const codec = new Codec({
+    element: {type: 'int64'},
+  });
+  const value = [1n, -2n, 3n, -4n];
+  const view = new DataView(new ArrayBuffer(codec.size(value)));
+  expect(codec.encode(value, view, 0)).to.equal(36);
+  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
+});
+
+test('uint64 array', async () => {
+  const codec = new Codec({
+    element: {type: 'uint64'},
+  });
+  const value = [1n, 2n, 3n, 4n];
+  const view = new DataView(new ArrayBuffer(codec.size(value)));
+  expect(codec.encode(value, view, 0)).to.equal(36);
+  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
+});
 
 test('string array', async () => {
   const codec = new Codec({

@@ -1,5 +1,10 @@
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
+  globals: {
+    BigInt: false,
+    BigInt64Array: false,
+    BigUint64Array: false,
+  },
   root: true,
   parserOptions: {
     ecmaVersion: 'latest',
