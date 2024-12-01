@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/cha0s/crunches/compare/crunches-v1.5.0...crunches-v1.5.1) (2024-12-01)
+
+
+### Bug Fixes
+
+* lib filename ([0471cac](https://github.com/cha0s/crunches/commit/0471cac723a5652f80c1ed5421f92a9770ca1ac4))
+
 ## [1.5.0](https://github.com/cha0s/crunches/compare/crunches-v1.4.1...crunches-v1.5.0) (2024-11-27)
 
 
