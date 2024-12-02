@@ -16,12 +16,31 @@ export function typeToElementClass(type) {
   return undefined;
 }
 
-export function paddingForType(type) {
-  let padding = 0;
+export function paddingForType(type, byteOffset) {
+  let width = 0;
   switch (type) {
-    case 'float64': padding = 4; break;
+    case 'int16':
+    case 'uint16': {
+      width = 2;
+      break;
+    }
+    case 'float32':
+    case 'int32':
+    case 'uint32': {
+      width = 4;
+      break;
+    }
+    case 'float64': {
+      width = 8;
+      break;
+    }
+    default: return 0;
   }
-  return padding;
+  const extra = byteOffset & (width - 1);
+  if (0 === extra) {
+    return 0;
+  }
+  return width - extra;
 }
 
 class ArrayCodec {
@@ -30,6 +49,7 @@ class ArrayCodec {
 
   constructor(blueprint) {
     this.$$elementCodec = resolveCodec(blueprint.element);
+    this.$$paddingForType = paddingForType;
     const {length = 0} = blueprint;
     const {type} = blueprint.element;
     const ElementClass = typeToElementClass(type);
@@ -38,11 +58,12 @@ class ArrayCodec {
     if (0 === length) {
       decoderCode += `
         const length = view.getUint32(target.byteOffset);
-        target.byteOffset += 4 + ${paddingForType(type)};
+        target.byteOffset += 4;
+        target.byteOffset += this.$$paddingForType('${type}', target.byteOffset);
       `;
       encoderCode += `
         let length = 0;
-        let written = 4 + ${paddingForType(type)};
+        let written = 4 + this.$$paddingForType('${type}', byteOffset + 4);
       `;
       if (ElementClass) {
         encoderCode += `
@@ -50,7 +71,8 @@ class ArrayCodec {
             length = value.length;
             new ElementClass(
               view.buffer,
-              view.byteOffset + byteOffset + written
+              view.byteOffset + byteOffset + written,
+              length,
             ).set(new ElementClass(value));
             written += ElementClass.BYTES_PER_ELEMENT * length;
           }
@@ -71,8 +93,8 @@ class ArrayCodec {
         return written;
       `;
       if (ElementClass) {
-        this.$$size = (value) => {
-          let size = 4 + paddingForType(type);
+        this.$$size = (value, byteOffset) => {
+          let size = 4 + paddingForType(type, byteOffset + 4);
           if (Array.isArray(value)) {
             return size + value.length * ElementClass.BYTES_PER_ELEMENT;
           }
@@ -80,16 +102,16 @@ class ArrayCodec {
             return size + value.size * ElementClass.BYTES_PER_ELEMENT;
           }
           for (const element of value) {
-            size += this.$$elementCodec.size(element);
+            size += this.$$elementCodec.size(element, byteOffset + size);
           }
           return size;
         };
       }
       else {
         this.$$size = (value) => {
-          let size = 4 + paddingForType(type);
+          let size = 4;
           for (const element of value) {
-            size += this.$$elementCodec.size(element);
+            size += this.$$elementCodec.size(element, size);
           }
           return size;
         };
@@ -98,13 +120,15 @@ class ArrayCodec {
     // fixed
     else {
       decoderCode += `const length = ${length};`;
-      encoderCode += 'let written = 0;';
+      encoderCode += `let written = 0`;
       if (ElementClass) {
         encoderCode += `
           if (Array.isArray(value)) {
+            written += this.$$paddingForType('${type}', byteOffset);
             new ElementClass(
               view.buffer,
-              view.byteOffset + byteOffset + written
+              view.byteOffset + byteOffset + written,
+              ${length},
             ).set(new ElementClass(value));
             written += ElementClass.BYTES_PER_ELEMENT * ${length};
           }
@@ -128,8 +152,8 @@ class ArrayCodec {
       }
       encoderCode += 'return written;';
       if (ElementClass) {
-        this.$$size = () => {
-          return length * ElementClass.BYTES_PER_ELEMENT;
+        this.$$size = (value, byteOffset) => {
+          return paddingForType(type, byteOffset) + length * ElementClass.BYTES_PER_ELEMENT;
         };
       }
       else {
@@ -152,6 +176,7 @@ class ArrayCodec {
     // static shape
     if (ElementClass) {
       decoderCode += `
+        target.byteOffset += this.$$paddingForType('${type}', target.byteOffset);
         const value = new ElementClass(view.buffer, view.byteOffset + target.byteOffset, length);
         target.byteOffset += ${ElementClass.BYTES_PER_ELEMENT} * length;
       `;
@@ -180,8 +205,8 @@ class ArrayCodec {
     return this.$$encode(value, view, byteOffset);
   }
 
-  size(value) {
-    return this.$$size(value);
+  size(value, byteOffset) {
+    return this.$$size(value, byteOffset);
   }
 
 }

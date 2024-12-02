@@ -16,7 +16,7 @@ test('object', async () => {
       2: {type: 'uint8'},
     },
   });
-  const view = new DataView(new ArrayBuffer(codec.size({1: 32, 2: 32})));
+  const view = new DataView(new ArrayBuffer(codec.size({1: 32, 2: 32}, 0)));
   expect(codec.encode({1: 32, 2: 32}, view, 0)).to.equal(2);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal({1: 32, 2: 32});
 });
@@ -30,13 +30,13 @@ test('object boolean coalescence', async () => {
     value[i] = i;
   }
   codec = new Codec(blueprint);
-  expect(codec.size(value)).to.equal(1);
+  expect(codec.size(value, 0)).to.equal(1);
   for (let i = 8; i < 16; ++i) {
     blueprint.properties[i] = {type: 'bool'};
     value[i] = i;
   }
   codec = new Codec(blueprint);
-  expect(codec.size(value)).to.equal(2);
+  expect(codec.size(value, 0)).to.equal(2);
 });
 
 test('object aliased boolean coalescence', async () => {
@@ -48,13 +48,13 @@ test('object aliased boolean coalescence', async () => {
     value[i] = i;
   }
   codec = new Codec(blueprint);
-  expect(codec.size(value)).to.equal(1);
+  expect(codec.size(value, 0)).to.equal(1);
   for (let i = 8; i < 16; ++i) {
     blueprint.properties[i] = {type: 'boolean'};
     value[i] = i;
   }
   codec = new Codec(blueprint);
-  expect(codec.size(value)).to.equal(2);
+  expect(codec.size(value, 0)).to.equal(2);
 });
 
 test('object optional coalescence', async () => {
@@ -66,13 +66,13 @@ test('object optional coalescence', async () => {
     value[i] = i;
   }
   codec = new Codec(blueprint);
-  expect(codec.size(value)).to.equal(8 + 1);
+  expect(codec.size(value, 0)).to.equal(8 + 1);
   for (let i = 8; i < 16; ++i) {
     blueprint.properties[i] = {optional: true, type: 'uint8'};
     value[i] = i;
   }
   codec = new Codec(blueprint);
-  expect(codec.size(value)).to.equal(16 + 2);
+  expect(codec.size(value, 0)).to.equal(16 + 2);
 });
 
 test('object optional property', async () => {
@@ -89,8 +89,8 @@ test('object optional property', async () => {
       }
     },
   });
-  expect(codec.size({1: 32, 2: 32, 3: {4: 32}})).to.equal(5);
-  const view = new DataView(new ArrayBuffer(codec.size({1: 32, 2: 32, 3: {4: 32}})));
+  expect(codec.size({1: 32, 2: 32, 3: {4: 32}}, 0)).to.equal(5);
+  const view = new DataView(new ArrayBuffer(codec.size({1: 32, 2: 32, 3: {4: 32}}, 0)));
   codec.encode({1: 32, 2: 32, 3: {4: 32}}, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal({1: 32, 2: 32, 3: {4: 32}});
   codec.encode({1: 32, 2: 32, 3: {}}, view, 0);
@@ -109,8 +109,8 @@ test('object boolean properties', async () => {
     value[i] = !!(i % 2);
   }
   const codec = new Codec(blueprint);
-  expect(codec.size(value)).to.equal(1);
-  const view = new DataView(new ArrayBuffer(codec.size(value)));
+  expect(codec.size(value, 0)).to.equal(1);
+  const view = new DataView(new ArrayBuffer(codec.size(value, 0)));
   codec.encode(value, view, 0);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
 });
@@ -122,8 +122,8 @@ test('object boolean optional interaction', async () => {
     blueprint.properties[i] = {optional: true, type: 'bool'};
   }
   const codec = new Codec(blueprint);
-  expect(codec.size(value)).to.equal(1);
-  const view = new DataView(new ArrayBuffer(codec.size(value)));
+  expect(codec.size(value, 0)).to.equal(1);
+  const view = new DataView(new ArrayBuffer(codec.size(value, 0)));
   const written = codec.encode(value, view, 0);
   expect(written).to.equal(1);
   expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);

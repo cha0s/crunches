@@ -12,12 +12,13 @@ import {Schema} from 'crunches';
 const playerSchema = new Schema({
   type: 'object',
   properties: {
-    health: {type: 'varuint'},
-    jumping: {type: 'bool'},
     position: {
       type: 'array',
       element: {type: 'float32'},
+      length: 3,
     },
+    health: {type: 'varuint'},
+    jumping: {type: 'bool'},
     attributes: {
       type: 'object',
       properties: {
@@ -33,9 +34,9 @@ const playerSchema = new Schema({
 On the server:
 ```js
 const player = {
+  position: [-540.2378623, 343.183749, 1201.23897468],
   health: 4000,
   jumping: false,
-  position: [-540.2378623, 343.183749, 1201.23897468],
   attributes: {str: 87, agi: 42, int: 22},
 };
 
@@ -64,7 +65,7 @@ socket.on('player-data', (buffer) => {
 });
 ```
 
-In this example, the size of payload is only **22 bytes**. `JSON.stringify` would consume **124 bytes**.
+In this example, the size of payload is only **18 bytes**. `JSON.stringify` would consume **124 bytes**.
 
 **NOTE:** There is a convenience method `Schema::allocate(value)` which will allocate a view over a buffer sized to hold your value. Above, we did:
 
@@ -289,8 +290,8 @@ class YourCodec {
   // return the number of bytes written
   encode(value: any, view: DataView, byteOffset: number): number
 
-  // get the encoded size of a value
-  size(value: any): number
+  // get the encoded size of a value; accept an offset to calculate any relevant padding necessary
+  size(value: any, byteOffset: number): number
 
 }
 ```

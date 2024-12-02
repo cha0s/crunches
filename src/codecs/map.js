@@ -31,12 +31,12 @@ class MapCodec extends ArrayCodec {
     return super.encode(entries, view, byteOffset);
   }
 
-  size(value) {
+  size(value, offset) {
     const entries = [];
     for (const [key, mapValue] of value) {
       entries.push({key, value: mapValue});
     }
-    return super.size(entries);
+    return super.size(entries, offset);
   }
 
 }

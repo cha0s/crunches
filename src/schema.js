@@ -22,7 +22,7 @@ class Schema {
   }
 
   size(value) {
-    return this.$$codec.size(value);
+    return this.$$codec.size(value, 0);
   }
 
 }

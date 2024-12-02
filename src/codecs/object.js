@@ -117,7 +117,7 @@ class ObjectCodec {
     decoderCode += 'return value';
     this.$$decode = new Function('view, target', decoderCode);
     this.$$encode = new Function('value, view, byteOffset', encoderCode);
-    this.$$size = (value) => {
+    this.$$size = (value, byteOffset) => {
       let {$$booleans} = this;
       let size = 0;
       size += Math.ceil(this.$$optionals / 8);
@@ -133,7 +133,7 @@ class ObjectCodec {
           continue;
         }
         if (!(codec instanceof BoolCodec)) {
-          size += codec.size(value[key]);
+          size += codec.size(value[key], byteOffset + size);
         }
         i += 1;
       }
@@ -150,8 +150,8 @@ class ObjectCodec {
     return this.$$encode(value, view, byteOffset);
   }
 
-  size(value) {
-    return this.$$size(value);
+  size(value, byteOffset) {
+    return this.$$size(value, byteOffset);
   }
 
 }
