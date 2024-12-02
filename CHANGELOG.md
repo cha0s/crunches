@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.0.0](https://github.com/cha0s/crunches/compare/crunches-v1.5.1...crunches-v2.0.0) (2024-12-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* encoding ergonomics
+
+### Features
+
+* encoding ergonomics ([71b4442](https://github.com/cha0s/crunches/commit/71b44424b1240f391318c63830bc140fe578a10e))
+
+
+### Bug Fixes
+
+* alignment ([58ba4d0](https://github.com/cha0s/crunches/commit/58ba4d0af4a8da02df676fd050dc6cc12397a239))
+* error ergonomics ([d9e373d](https://github.com/cha0s/crunches/commit/d9e373d95748fecf05b178177f882af9c28fb6fc))
+
 ## [1.5.1](https://github.com/cha0s/crunches/compare/crunches-v1.5.0...crunches-v1.5.1) (2024-12-01)
 
 
