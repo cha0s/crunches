@@ -2,7 +2,7 @@
 
 # crunches :muscle: 
 
-The smallest **and** fastest JavaScript web standards-compliant value serialization library in the wild. **3.36 kB** gzipped; **0 dependencies**. Efficiently encode and decode your values to and from `ArrayBuffer`s. Integrates very well with WebSockets.
+The smallest **and** fastest JavaScript web standards-compliant value serialization library in the wild. **3.59 kB** gzipped; **0 dependencies**. Efficiently encode and decode your values to and from `ArrayBuffer`s. Integrates very well with WebSockets.
 
 ## Example
 
@@ -232,13 +232,14 @@ Using the original example with all optional fields:
 const stateSchema = new Schema({
   type: 'object',
   properties: {
-    health: {type: 'varuint', optional: true},
-    jumping: {type: 'bool', optional: true},
     position: {
       type: 'array',
       element: {type: 'float32'},
+      length: 3,
       optional: true,
     },
+    health: {type: 'varuint', optional: true},
+    jumping: {type: 'bool', optional: true},
     attributes: {
       type: 'object',
       properties: {
