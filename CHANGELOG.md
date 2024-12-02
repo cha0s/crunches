@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1](https://github.com/cha0s/crunches/compare/crunches-v2.0.0...crunches-v2.0.1) (2024-12-02)
+
+
+### Bug Fixes
+
+* benchmark ([34fc1cb](https://github.com/cha0s/crunches/commit/34fc1cbf8793624551916405c44be556024bb8a3))
+* modern exports ([22275af](https://github.com/cha0s/crunches/commit/22275afd3be47083aa63535214c1615ac207069c))
+
 ## [2.0.0](https://github.com/cha0s/crunches/compare/crunches-v1.5.1...crunches-v2.0.0) (2024-12-02)
 
 
