@@ -67,11 +67,11 @@ else {
   value.opaque = opaque.buffer;
   const crunchesView = crunchesPerson.allocate(value);
   for (let i = 0; i < N; ++i) {
-    crunchesPerson.encode(value, crunchesView);
+    crunchesPerson.encodeInto(value, crunchesView);
   }
   const crunchesEncodeStart = performance.now();
   for (let i = 0; i < N; ++i) {
-    crunchesPerson.encode(value, crunchesView);
+    crunchesPerson.encodeInto(value, crunchesView);
   }
   console.log('crunches\t', (performance.now() - crunchesEncodeStart).toFixed(2), 'ms');
 
