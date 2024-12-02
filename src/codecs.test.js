@@ -21,3 +21,13 @@ test('alias cycle', async () => {
   Aliases.bar = 'foofoo';
   expect(() => resolveCodec({type: 'foofoo'})).toThrowError();
 });
+
+test('no blueprint', async () => {
+  expect(() => resolveCodec()).toThrowError();
+});
+
+test('suggestion', async () => {
+  expect(() => resolveCodec('bool')).toThrowError(
+    "Blueprint 'bool' looks like a type. Try {type: 'bool'}",
+  );
+});

@@ -5,9 +5,18 @@ export const Aliases = {
 export const Codecs = {};
 
 export function resolveCodec(blueprint) {
+  if (!blueprint) {
+    throw new TypeError('No blueprint specified.');
+  }
   let {type} = blueprint;
   if (undefined === type) {
-    throw new TypeError("No codec specified. Did you forget to include a 'type' key in your schema blueprint?");
+    try {
+      resolveCodec({type: blueprint});
+    }
+    catch (error) {
+      throw new TypeError("No codec specified. Did you forget to include a 'type' key in your schema blueprint?");
+    }
+    throw new TypeError(`Blueprint '${blueprint}' looks like a type. Try {type: '${blueprint}'}`);
   }
   const searched = new Set([type]);
   let Codec = Codecs[type];
