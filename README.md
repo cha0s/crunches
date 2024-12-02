@@ -40,34 +40,36 @@ const player = {
   attributes: {str: 87, agi: 42, int: 22},
 };
 
-// get the schema size
-const size = playerSchema.size(player);
-// allocate a buffer
-const buffer = new ArrayBuffer(size);
-// create a view over the buffer
-const view = new DataView(buffer);
-// pass the view to the encoder
-const written = playerSchema.encode(player, view);
-// the encoder returns the number of bytes written
-console.log(written); // 22
+// encode the value to a new `DataView`
+const view = playerSchema.encode(player);
 // use some socket library to send the binary data...
-socket.emit('player-data', buffer);
+socket.emit('player-data', view);
 ```
 
 On the client:
 ```js
 // use some socket library to receive the binary data...
 socket.on('player-data', (buffer) => {
-  // create a view over the buffer
-  const view = new DataView(buffer);
-  // pass the view to the decoder to get the value
-  const player = playerSchema.decode(view);
+  const player = playerSchema.decode(buffer);
 });
 ```
 
 In this example, the size of payload is only **18 bytes**. `JSON.stringify` would consume **124 bytes**.
 
-**NOTE:** There is a convenience method `Schema::allocate(value)` which will allocate a view over a buffer sized to hold your value. Above, we did:
+### Allocating a buffer and view
+
+There is a convenience method which will allocate a view over a buffer sized to hold your value.
+
+```js
+// create a view for our value
+const view = playerSchema.allocate(player);
+// pass the view to the encoder
+playerSchema.encodeInto(player, view);
+```
+
+It can be useful for performance reasons to reuse your buffers.
+
+This is sugar over the following:
 
 ```js
 // get the schema size
@@ -77,17 +79,10 @@ const buffer = new ArrayBuffer(size);
 // create a view over the buffer
 const view = new DataView(buffer);
 // pass the view to the encoder
-const written = playerSchema.encode(player, view);
+playerSchema.encodeInto(player, view);
 ```
 
-This could be written equivalently as:
-
-```js
-// create a view for our value
-const view = playerSchema.allocate(player);
-// pass the view to the encoder
-const written = playerSchema.encode(player, view);
-```
+You may `encodeInto` a view over any existing `ArrayBuffer` **provided that it's large enough to contain the encoded payload**.
 
 ## Primitive types
 

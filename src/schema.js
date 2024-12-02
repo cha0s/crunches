@@ -13,11 +13,18 @@ class Schema {
     return new DataView(new ArrayBuffer(this.size(value)));
   }
 
-  decode(view, target = {byteOffset: 0}) {
+  decode(bufferOrView, target = {byteOffset: 0}) {
+    const view = ArrayBuffer.isView(bufferOrView) ? bufferOrView : new DataView(bufferOrView);
     return this.$$codec.decode(view, target);
   }
 
-  encode(value, view, byteOffset = 0) {
+  encode(value) {
+    const view = this.allocate(value);
+    this.encodeInto(value, view, 0);
+    return view;
+  }
+
+  encodeInto(value, view, byteOffset = 0) {
     return this.$$codec.encode(value, view, byteOffset);
   }
 
