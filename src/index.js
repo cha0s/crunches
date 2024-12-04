@@ -1,4 +1,4 @@
-import {Aliases, Codecs} from './codecs.js';
+import {Aliases, Codecs, resolveCodec} from './codecs.js';
 import Schema from './schema.js';
 
 const codecs = import.meta.glob(
@@ -10,4 +10,4 @@ for (const path in codecs) {
   Codecs[key] = codecs[path];
 }
 
-export {Aliases, Codecs, Schema};
+export {Aliases, Codecs, resolveCodec, Schema};
