@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/cha0s/crunches/compare/crunches-v2.0.1...crunches-v2.0.2) (2024-12-04)
+
+
+### Bug Fixes
+
+* export resolveCodec ([5626729](https://github.com/cha0s/crunches/commit/562672966979291b318f5a33d490a1060d15182a))
+
 ## [2.0.1](https://github.com/cha0s/crunches/compare/crunches-v2.0.0...crunches-v2.0.1) (2024-12-02)
 
 
