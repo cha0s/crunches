@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.3](https://github.com/cha0s/crunches/compare/crunches-v2.0.2...crunches-v2.0.3) (2024-12-09)
+
+
+### Bug Fixes
+
+* pass offset to size ([e64185e](https://github.com/cha0s/crunches/commit/e64185e67afdb976c0b432ff421659a17efaf07e))
+
 ## [2.0.2](https://github.com/cha0s/crunches/compare/crunches-v2.0.1...crunches-v2.0.2) (2024-12-04)
 
 
