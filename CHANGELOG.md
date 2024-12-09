@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.4](https://github.com/cha0s/crunches/compare/crunches-v2.0.3...crunches-v2.0.4) (2024-12-09)
+
+
+### Bug Fixes
+
+* array size byte offset ([2b7dcc8](https://github.com/cha0s/crunches/commit/2b7dcc80469bb095976ea1b2284e4ed3f01dd89e))
+
 ## [2.0.3](https://github.com/cha0s/crunches/compare/crunches-v2.0.2...crunches-v2.0.3) (2024-12-09)
 
 
