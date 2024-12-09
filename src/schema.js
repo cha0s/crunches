@@ -28,8 +28,8 @@ class Schema {
     return this.$$codec.encode(value, view, byteOffset);
   }
 
-  size(value) {
-    return this.$$codec.size(value, 0);
+  size(value, offset = 0) {
+    return this.$$codec.size(value, offset);
   }
 
 }
