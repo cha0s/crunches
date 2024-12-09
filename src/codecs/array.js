@@ -108,10 +108,10 @@ class ArrayCodec {
         };
       }
       else {
-        this.$$size = (value) => {
+        this.$$size = (value, byteOffset) => {
           let size = 4;
           for (const element of value) {
-            size += this.$$elementCodec.size(element, size);
+            size += this.$$elementCodec.size(element, size + byteOffset);
           }
           return size;
         };
@@ -157,7 +157,7 @@ class ArrayCodec {
         };
       }
       else {
-        this.$$size = (value) => {
+        this.$$size = (value, byteOffset) => {
           let size = 0;
           // let the environment report
           if (!value[Symbol.iterator]) {
@@ -166,7 +166,7 @@ class ArrayCodec {
           let protocol = value[Symbol.iterator]();
           let result = protocol.next();
           for (let i = 0; i < length; ++i) {
-            size += this.$$elementCodec.size(result.value);
+            size += this.$$elementCodec.size(result.value, size + byteOffset);
             result = protocol.next();
           }
           return size;
