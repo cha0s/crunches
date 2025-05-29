@@ -10,8 +10,8 @@ export function typeToElementClass(type) {
     case 'uint32': return Uint32Array;
     case 'float32': return Float32Array;
     case 'float64': return Float64Array;
-    case 'bigint64': return BigInt64Array;
-    case 'biguint64': return BigUint64Array;
+    case 'int64': return BigInt64Array;
+    case 'uint64': return BigUint64Array;
   }
   return undefined;
 }
@@ -30,7 +30,9 @@ export function paddingForType(type, byteOffset) {
       width = 4;
       break;
     }
-    case 'float64': {
+    case 'float64':
+    case 'int64':
+    case 'uint64': {
       width = 8;
       break;
     }

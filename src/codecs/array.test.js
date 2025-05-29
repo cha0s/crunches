@@ -59,8 +59,8 @@ test('int64 array', async () => {
   });
   const value = [1n, -2n, 3n, -4n];
   const view = new DataView(new ArrayBuffer(codec.size(value, 0)));
-  expect(codec.encode(value, view, 0)).to.equal(36);
-  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
+  expect(codec.encode(value, view, 0)).to.equal(4 + paddingForType('int64', 4) + 32);
+  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(new BigInt64Array(value));
 });
 
 test('uint64 array', async () => {
@@ -69,8 +69,8 @@ test('uint64 array', async () => {
   });
   const value = [1n, 2n, 3n, 4n];
   const view = new DataView(new ArrayBuffer(codec.size(value, 0)));
-  expect(codec.encode(value, view, 0)).to.equal(36);
-  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(value);
+  expect(codec.encode(value, view, 0)).to.equal(4 + paddingForType('uint64', 4) + 32);
+  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(new BigUint64Array(value));
 });
 
 test('string array', async () => {
