@@ -273,6 +273,25 @@ Math.ceil(numberOfOptionalFields / 8)
 
 bytes of space.
 
+### Endianness
+
+`crunches` defaults to little-endian byte ordering to align with the majority of machines'
+implementation of `TypedArray`. This may be overridden when calling `encode`/`decode` through the
+`isLittleEndian` flag. An excerpt of the above example has been modified to illustrate the change:
+
+On the server:
+```js
+// encode the value to a new `DataView`
+const view = playerSchema.encode(player, {isLittleEndian: false});
+```
+
+On the client:
+```js
+const player = playerSchema.decode(buffer, {isLittleEndian: false});
+```
+
+**NOTE:** Make sure you're using the same byte ordering on both ends!
+
 ### Extensible
 
 You may define your own codecs that handle encoding and decoding values. There is no base `Codec` class to inherit from, but your codec must implement an interface ([quack quack](https://en.wikipedia.org/wiki/Duck_typing)):
@@ -281,10 +300,10 @@ You may define your own codecs that handle encoding and decoding values. There i
 class YourCodec {
 
   // return the value
-  decode(view: DataView, target: {byteOffset: number}): any
+  decode(view: DataView, target: {byteOffset: number, isLittleEndian: bool}): any
 
   // return the number of bytes written
-  encode(value: any, view: DataView, byteOffset: number): number
+  encode(value: any, view: DataView, byteOffset: number, isLittleEndian: bool): number
 
   // get the encoded size of a value; accept an offset to calculate any relevant padding necessary
   size(value: any, byteOffset: number): number
@@ -307,11 +326,11 @@ class MyDateCodec extends Codecs.string {
     return new Date(decoded);
   }
 
-  encode(value, view, byteOffset) {
+  encode(value, view, byteOffset, isLittleEndian) {
     // convert it to a string
     const converted = new Date(value).toISOString();
     // pass it along to the `string` codec's encode method
-    return super.encode(converted, view, byteOffset);
+    return super.encode(converted, view, byteOffset, isLittleEndian);
   }
 
   size(value) {

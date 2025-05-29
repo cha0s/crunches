@@ -14,8 +14,8 @@ class BufferCodec {
     return value;
   }
 
-  encode(value, view, byteOffset) {
-    const prefixLength = this.$$prefix.encode(value.byteLength, view, byteOffset);
+  encode(value, view, byteOffset, isLittleEndian) {
+    const prefixLength = this.$$prefix.encode(value.byteLength, view, byteOffset, isLittleEndian);
     new Uint8Array(view.buffer, view.byteOffset)
       .set(new Uint8Array(value), byteOffset + prefixLength);
     return prefixLength + value.byteLength;

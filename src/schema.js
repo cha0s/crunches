@@ -14,19 +14,19 @@ class Schema {
     return new DataView(new ArrayBuffer(this.size(value)));
   }
 
-  decode(bufferOrView, target = {byteOffset: 0}) {
+  decode(bufferOrView, target = {byteOffset: 0, isLittleEndian: true}) {
     const view = ArrayBuffer.isView(bufferOrView) ? bufferOrView : new DataView(bufferOrView);
     return this.$$codec.decode(view, target);
   }
 
-  encode(value) {
+  encode(value, {isLittleEndian = true} = {}) {
     const view = this.allocate(value);
-    this.encodeInto(value, view, 0);
+    this.encodeInto(value, view, 0, isLittleEndian);
     return view;
   }
 
-  encodeInto(value, view, byteOffset = 0) {
-    return this.$$codec.encode(value, view, byteOffset);
+  encodeInto(value, view, byteOffset = 0, isLittleEndian = true) {
+    return this.$$codec.encode(value, view, byteOffset, isLittleEndian);
   }
 
   size(value, offset = 0) {

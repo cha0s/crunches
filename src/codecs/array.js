@@ -59,7 +59,7 @@ class ArrayCodec {
     // varlen
     if (0 === length) {
       decoderCode += `
-        const length = view.getUint32(target.byteOffset);
+        const length = view.getUint32(target.byteOffset, target.isLittleEndian);
         target.byteOffset += 4;
         target.byteOffset += this.$$paddingForType('${type}', target.byteOffset);
       `;
@@ -84,14 +84,14 @@ class ArrayCodec {
       encoderCode += `
         for (const element of value) {
           length += 1;
-          written += this.$$elementCodec.encode(element, view, byteOffset + written);
+          written += this.$$elementCodec.encode(element, view, byteOffset + written, isLittleEndian);
         }
       `;
       if (ElementClass) {
         encoderCode += '}';
       }
       encoderCode += `
-        view.setUint32(byteOffset, length);
+        view.setUint32(byteOffset, length, isLittleEndian);
         return written;
       `;
       if (ElementClass) {
@@ -145,7 +145,7 @@ class ArrayCodec {
         let protocol = value[Symbol.iterator]();
         let result = protocol.next();
         for (let i = 0; i < ${length}; ++i) {
-          written += this.$$elementCodec.encode(result.value, view, byteOffset + written);
+          written += this.$$elementCodec.encode(result.value, view, byteOffset + written, isLittleEndian);
           result = protocol.next();
         }
       `;
@@ -196,7 +196,7 @@ class ArrayCodec {
     decoderCode += 'return value;';
     const decoder = new Function('ElementClass, view, target', decoderCode);
     this.$$decode = decoder.bind(this, ElementClass);
-    const encoder = new Function('ElementClass, value, view, byteOffset', encoderCode);
+    const encoder = new Function('ElementClass, value, view, byteOffset, isLittleEndian', encoderCode);
     this.$$encode = encoder.bind(this, ElementClass);
   }
 
@@ -204,8 +204,8 @@ class ArrayCodec {
     return this.$$decode(view, target);
   }
 
-  encode(value, view, byteOffset) {
-    return this.$$encode(value, view, byteOffset);
+  encode(value, view, byteOffset, isLittleEndian) {
+    return this.$$encode(value, view, byteOffset, isLittleEndian);
   }
 
   size(value, byteOffset) {

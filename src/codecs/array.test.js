@@ -39,39 +39,57 @@ for (const numberType of [
   'float32',
   'float64',
 ]) {
-  test(`${numberType} array`, async () => {
-    const codec = new Codec({
-      element: {type: numberType},
-    });
-    const value = [1, 2, 3, 4];
-    const ElementClass = typeToElementClass(numberType);
+  const codec = new Codec({
+    element: {type: numberType},
+  });
+  const ElementClass = typeToElementClass(numberType);
+  const testNumberArray = (value) => {
     const size = codec.size(value, 0);
     expect(size).to.equal(4 + paddingForType(numberType, 4) + ElementClass.BYTES_PER_ELEMENT * 4);
     const view = new DataView(new ArrayBuffer(size));
-    expect(codec.encode(value, view, 0)).to.equal(size);
-    expect(Array.from(codec.decode(view, {byteOffset: 0}))).to.deep.equal(value);
+    expect(codec.encode(value, view, 0, true)).to.equal(size);
+    expect(codec.decode(view, {byteOffset: 0, isLittleEndian: true})).to.deep.equal(
+      new ElementClass(value),
+    );
+  }
+  test(`${numberType} typed array`, async () => {
+    testNumberArray(new ElementClass([1, 2, 3, 4]));
+  });
+  test(`${numberType} array`, async () => {
+    testNumberArray([1, 2, 3, 4]);
+  });
+  test(`${numberType} iterable`, async () => {
+    testNumberArray(new Set([1, 2, 3, 4]));
   });
 }
 
-test('int64 array', async () => {
+for (const bigNumberType of [
+  'int64',
+  'uint64',
+]) {
   const codec = new Codec({
-    element: {type: 'int64'},
+    element: {type: bigNumberType},
   });
-  const value = [1n, -2n, 3n, -4n];
-  const view = new DataView(new ArrayBuffer(codec.size(value, 0)));
-  expect(codec.encode(value, view, 0)).to.equal(4 + paddingForType('int64', 4) + 32);
-  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(new BigInt64Array(value));
-});
-
-test('uint64 array', async () => {
-  const codec = new Codec({
-    element: {type: 'uint64'},
+  const ElementClass = typeToElementClass(bigNumberType);
+  const testNumberArray = (value) => {
+    const size = codec.size(value, 0);
+    expect(size).to.equal(4 + paddingForType(bigNumberType, 4) + ElementClass.BYTES_PER_ELEMENT * 4);
+    const view = new DataView(new ArrayBuffer(size));
+    expect(codec.encode(value, view, 0, true)).to.equal(size);
+    expect(codec.decode(view, {byteOffset: 0, isLittleEndian: true})).to.deep.equal(
+      new ElementClass(value),
+    );
+  }
+  test(`${bigNumberType} typed array`, async () => {
+    testNumberArray(new ElementClass([1n, 2n, 3n, 4n]));
   });
-  const value = [1n, 2n, 3n, 4n];
-  const view = new DataView(new ArrayBuffer(codec.size(value, 0)));
-  expect(codec.encode(value, view, 0)).to.equal(4 + paddingForType('uint64', 4) + 32);
-  expect(codec.decode(view, {byteOffset: 0})).to.deep.equal(new BigUint64Array(value));
-});
+  test(`${bigNumberType} array`, async () => {
+    testNumberArray([1n, 2n, 3n, 4n]);
+  });
+  test(`${bigNumberType} iterable`, async () => {
+    testNumberArray(new Set([1n, 2n, 3n, 4n]));
+  });
+}
 
 test('string array', async () => {
   const codec = new Codec({

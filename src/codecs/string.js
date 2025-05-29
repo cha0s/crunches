@@ -20,13 +20,13 @@ class StringCodec {
     return this.constructor.decoder.decode(stringView);
   }
 
-  encode(value, view, byteOffset) {
+  encode(value, view, byteOffset, isLittleEndian) {
     const prefixLength = this.$$prefix.size(value.length * 3);
     const {written} = this.constructor.encoder.encodeInto(
       value,
       new Uint8Array(view.buffer, view.byteOffset + byteOffset + prefixLength),
     );
-    this.$$prefix.encode(written, view, byteOffset);
+    this.$$prefix.encode(written, view, byteOffset, isLittleEndian);
     return prefixLength + written;
   }
 

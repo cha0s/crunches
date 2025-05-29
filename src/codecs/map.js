@@ -23,12 +23,12 @@ class MapCodec extends ArrayCodec {
     return value;
   }
 
-  encode(value, view, byteOffset) {
+  encode(value, view, byteOffset, isLittleEndian) {
     const entries = [];
     for (const [key, mapValue] of value) {
       entries.push({key, value: mapValue});
     }
-    return super.encode(entries, view, byteOffset);
+    return super.encode(entries, view, byteOffset, isLittleEndian);
   }
 
   size(value, offset) {

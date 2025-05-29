@@ -44,7 +44,7 @@ class ObjectCodec {
       }
       else {
         decoderCode += `value['${key}'] = this.$$codecs[${i}].decode(view, target);`;
-        encoderCode += `written += this.$$codecs[${i}].encode(value['${key}'], view, byteOffset + written);`;
+        encoderCode += `written += this.$$codecs[${i}].encode(value['${key}'], view, byteOffset + written, isLittleEndian);`;
       }
       if (property.optional) {
         decoderCode += `
@@ -67,7 +67,7 @@ class ObjectCodec {
         const booleanCount = Math.ceil($$booleans / 8);
         if (booleanCount > 0) {
           for (let i = 0; i < booleanCount; ++i) {
-            booleanFlags.push(view.getUint8(target.byteOffset));
+            booleanFlags.push(view.getUint8(target.byteOffset, target.isLittleEndian));
             target.byteOffset += 1;
           }
           for (const {bit, index, key} of booleanBackpatches) {
@@ -77,7 +77,7 @@ class ObjectCodec {
       `;
       encoderCode += `
         for (let i = 0; i < booleanFlags.length; ++i) {
-          view.setUint8(byteOffset + written + i, booleanFlags[i]);
+          view.setUint8(byteOffset + written + i, booleanFlags[i], isLittleEndian);
         }
         written += booleanFlags.length;
       `;
@@ -92,13 +92,13 @@ class ObjectCodec {
         let currentOptional = 0;
         const optionalCount = Math.ceil(this.$$optionals / 8);
         for (let i = 0; i < optionalCount; ++i) {
-          optionalFlags.push(view.getUint8(target.byteOffset));
+          optionalFlags.push(view.getUint8(target.byteOffset, target.isLittleEndian));
           target.byteOffset += 1;
         }
       ` + decoderCode;
       encoderCode += `
         for (let i = 0; i < optionalFlags.length; ++i) {
-          view.setUint8(byteOffset + i, optionalFlags[i]);
+          view.setUint8(byteOffset + i, optionalFlags[i], isLittleEndian);
         }
       `;
       encoderCode = `
@@ -116,7 +116,7 @@ class ObjectCodec {
     `;
     decoderCode += 'return value';
     this.$$decode = new Function('view, target', decoderCode);
-    this.$$encode = new Function('value, view, byteOffset', encoderCode);
+    this.$$encode = new Function('value, view, byteOffset, isLittleEndian', encoderCode);
     this.$$size = (value, byteOffset) => {
       let {$$booleans} = this;
       let size = 0;
@@ -146,8 +146,8 @@ class ObjectCodec {
     return this.$$decode(view, target);
   }
 
-  encode(value, view, byteOffset) {
-    return this.$$encode(value, view, byteOffset);
+  encode(value, view, byteOffset, isLittleEndian) {
+    return this.$$encode(value, view, byteOffset, isLittleEndian);
   }
 
   size(value, byteOffset) {
