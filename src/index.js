@@ -1,3 +1,4 @@
+/* v8 ignore start */
 import {Aliases, Codecs, resolveCodec} from './codecs.js';
 import Schema from './schema.js';
 

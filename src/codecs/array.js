@@ -162,6 +162,7 @@ class ArrayCodec {
         this.$$size = (value, byteOffset) => {
           let size = 0;
           // let the environment report
+          /* v8 ignore next 3 */
           if (!value[Symbol.iterator]) {
             for (const _ of value) {/* ... */} // eslint-disable-line no-unused-vars
           }

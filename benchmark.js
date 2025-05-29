@@ -1,3 +1,4 @@
+/* v8 ignore start */
 // acrobatics! run vite on... ourselves
 if (!process.env.INSIDE_VITE) {
   // suppress spam

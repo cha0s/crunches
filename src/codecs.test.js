@@ -31,3 +31,9 @@ test('suggestion', async () => {
     "Blueprint 'bool' looks like a type. Try {type: 'bool'}",
   );
 });
+
+test('no type', () => {
+  expect(() => resolveCodec({})).toThrowError(
+    'forget to include',
+  );
+})

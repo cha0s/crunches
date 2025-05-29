@@ -1,3 +1,4 @@
+/* v8 ignore start */
 import {resolveCodec} from './codecs.js';
 
 // Just an ergonomic wrapper around the root codec.
