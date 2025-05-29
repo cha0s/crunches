@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.0](https://github.com/cha0s/crunches/compare/crunches-v2.0.4...crunches-v2.1.0) (2025-05-29)
+
+
+### Features
+
+* endianness ([19bdca8](https://github.com/cha0s/crunches/commit/19bdca80bdad8b57885f68e293c5bf8f1be250d8))
+
+
+### Bug Fixes
+
+* 64-bit typed arrays ([86a3ebe](https://github.com/cha0s/crunches/commit/86a3ebece4aa2ad4fc8fdece84e1b891472c5760))
+
 ## [2.0.4](https://github.com/cha0s/crunches/compare/crunches-v2.0.3...crunches-v2.0.4) (2024-12-09)
 
 
