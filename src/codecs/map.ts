@@ -20,7 +20,13 @@ export class CrunchesMap <
     this.$$array = new CrunchesArray({
       element: new CrunchesObject({ key, value }),
     })
-    this.$$array.isLittleEndian = this.isLittleEndian
+  }
+
+  bigEndian(): this {
+    if (undefined === this.$$array.isLittleEndian) {
+      this.$$array.bigEndian()
+    }
+    return super.bigEndian()
   }
 
   decodeFrom(view: DataView, target: Target): Map<K['_output'], V['_output']> {
@@ -41,6 +47,13 @@ export class CrunchesMap <
       entries.push({ key: k, value: v })
     }
     return this.$$array.encodeInto(entries as any, view, byteOffset)
+  }
+
+  littleEndian(): this {
+    if (undefined === this.$$array.isLittleEndian) {
+      this.$$array.littleEndian()
+    }
+    return super.littleEndian()
   }
 
   sizeOf(

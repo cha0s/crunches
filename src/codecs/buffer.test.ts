@@ -5,7 +5,7 @@ import { map } from './map.ts'
 import { uint8 } from './uint8.ts'
 import { string } from './string.ts'
 
-test('buffer', async () => {
+test('buffer', () => {
   const mapSchema = map({
     key: uint8(),
     value: string(),
@@ -20,7 +20,7 @@ test('buffer', async () => {
   expect(mapSchema.decode(newMapView)).to.deep.equal(value)
 })
 
-test('varuint-prefixed buffer', async () => {
+test('varuint-prefixed buffer', () => {
   const mapSchema = map({
     key: uint8(),
     value: string(),

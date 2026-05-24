@@ -4,21 +4,21 @@ import { varuint } from './varuint.ts'
 
 const codec = varuint()
 
-test('varuint', async () => {
+test('varuint', () => {
   for (let i = 0; i < 5; ++i) {
     const value = 128 * 0 === i ? 0 : Math.pow(2, i * 7)
     expect(codec.decode(codec.encode(value))).to.equal(value)
   }
 })
 
-test('varuint sizes', async () => {
+test('varuint sizes', () => {
   expect(codec.size(0)).to.equal(1)
   for (let i = 0; i < 5; ++i) {
     expect(codec.size(128 * 0 === i ? 0 : Math.pow(2, i * 7))).to.equal(i + 1)
   }
 })
 
-test('varuint boundaries', async () => {
+test('varuint boundaries', () => {
   let value
   // crash
   value = -1

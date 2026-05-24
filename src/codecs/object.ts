@@ -56,7 +56,6 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
     for (const key in props) {
       const property = props[key]
       const codec = property instanceof CrunchesOptional ? property.inner : property
-      const isLittleEndian = codec.isLittleEndian ?? this.isLittleEndian ?? true
       if (property instanceof CrunchesOptional) {
         this.$$optionals += 1
         decoderCode += `
@@ -85,7 +84,7 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
       }
       else {
         decoderCode += `value['${key}'] = this.$$codecs[${i}].decodeFrom(view, target);`
-        encoderCode += `written += this.$$codecs[${i}].encodeInto(value['${key}'], view, byteOffset + written, ${isLittleEndian});`
+        encoderCode += `written += this.$$codecs[${i}].encodeInto(value['${key}'], view, byteOffset + written);`
       }
       if (property instanceof CrunchesOptional) {
         decoderCode += `
@@ -184,12 +183,30 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
 
   }
 
+  bigEndian(): this {
+    for (const codec of this.$$codecs) {
+      if (undefined === codec.isLittleEndian) {
+        codec.bigEndian()
+      }
+    }
+    return super.bigEndian()
+  }
+
   decodeFrom(view: DataView, target: Target) {
     return this.$$decodeFrom(view, target)
   }
 
   encodeInto(value: InferObjectInput<P>, view: DataView, byteOffset: number) {
     return this.$$encodeInto(value, view, byteOffset)
+  }
+
+  littleEndian(): this {
+    for (const codec of this.$$codecs) {
+      if (undefined === codec.isLittleEndian) {
+        codec.littleEndian()
+      }
+    }
+    return super.littleEndian()
   }
 
   sizeOf(value: InferObjectInput<P>, byteOffset: number) {

@@ -33,13 +33,13 @@ for (const numberType of [
       new element.elementClass(value),
     )
   }
-  test(`${numberType.name} typed array`, async () => {
+  test(`${numberType.name} typed array`, () => {
     testNumberArray(new element.elementClass([1, 2, 3, 4]))
   })
-  test(`${numberType.name} array`, async () => {
+  test(`${numberType.name} array`, () => {
     testNumberArray([1, 2, 3, 4])
   })
-  test(`${numberType.name} iterable`, async () => {
+  test(`${numberType.name} iterable`, () => {
     testNumberArray(new Set([1, 2, 3, 4]))
   })
 }
@@ -57,18 +57,18 @@ for (const numberType of [
       new element.elementClass(value),
     )
   }
-  test(`${numberType.name} typed array`, async () => {
+  test(`${numberType.name} typed array`, () => {
     testNumberArray(new element.elementClass([1n, 2n, 3n, 4n]))
   })
-  test(`${numberType.name} array`, async () => {
+  test(`${numberType.name} array`, () => {
     testNumberArray([1n, 2n, 3n, 4n])
   })
-  test(`${numberType.name} iterable`, async () => {
+  test(`${numberType.name} iterable`, () => {
     testNumberArray(new Set([1n, 2n, 3n, 4n]))
   })
 }
 
-test('string array', async () => {
+test('string array', () => {
   const codec = array({
     element: string(),
   })
@@ -76,7 +76,7 @@ test('string array', async () => {
   expect(codec.decode(codec.encode(value))).to.deep.equal(value)
 })
 
-test('fixed-length integer array', async () => {
+test('fixed-length integer array', () => {
   const codec = array({
     element: uint8(),
     length: 4,
@@ -85,7 +85,7 @@ test('fixed-length integer array', async () => {
   expect(Array.from(codec.decode(codec.encode(value)))).to.deep.equal(value)
 })
 
-test('fixed-length float array', async () => {
+test('fixed-length float array', () => {
   const codec = array({
     element: float64(),
     length: 4,
@@ -94,7 +94,7 @@ test('fixed-length float array', async () => {
   expect(Array.from(codec.decode(codec.encode(value)))).to.deep.equal(value)
 })
 
-test('fixed-length string array', async () => {
+test('fixed-length string array', () => {
   const codec = array({
     element: string(),
     length: 4,
@@ -103,7 +103,7 @@ test('fixed-length string array', async () => {
   expect(Array.from(codec.decode(codec.encode(value)))).to.deep.equal(value)
 })
 
-test('fixed-length string drop', async () => {
+test('fixed-length string drop', () => {
   const length = 3
   const codec = array({
     element: string(),
@@ -113,7 +113,7 @@ test('fixed-length string drop', async () => {
   expect(Array.from(codec.decode(codec.encode(value)))).to.deep.equal(value.slice(0, length))
 })
 
-test('fixed-length string starved', async () => {
+test('fixed-length string starved', () => {
   const length = 3
   const codec = array({
     element: string(),
@@ -135,7 +135,7 @@ for (const numberType of [
   float64,
 ]) {
   const element = numberType()
-  test(`aligned ${numberType.name} array`, async () => {
+  test(`aligned ${numberType.name} array`, () => {
     const codec = object({
       offset: int8(),
       array: array({element}),
@@ -143,7 +143,7 @@ for (const numberType of [
     const value = {offset: 0, array: [0, 1, 2]}
     expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(value.array)
   })
-  test(`aligned fixed-length ${numberType.name} array`, async () => {
+  test(`aligned fixed-length ${numberType.name} array`, () => {
     const codec = object({
       offset: int8(),
       array: array({element, length: 3}),
@@ -152,3 +152,41 @@ for (const numberType of [
     expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(value.array)
   })
 }
+
+test('prefix endianness', () => {
+  // big
+  expect(3).to.equal(array({element: uint32()}).bigEndian().encode([1, 2, 3]).getUint32(0, false))
+  // default (little)
+  expect(3).to.equal(array({element: uint32()}).encode([1, 2, 3]).getUint32(0, true))
+  // little
+  expect(3).to.equal(array({element: uint32()}).littleEndian().encode([1, 2, 3]).getUint32(0, true))
+})
+
+test('element endianness', () => {
+  let encoded
+  // big
+  encoded = array({element: uint32(), length: 3}).bigEndian().encode([1, 2, 3])
+  for (let i = 0; i < 3; ++i) {
+    expect(i + 1).to.equal(encoded.getUint32(4 * i, false))
+  }
+  // overridden (little)
+  encoded = array({element: uint32().littleEndian(), length: 3}).bigEndian().encode([1, 2, 3])
+  for (let i = 0; i < 3; ++i) {
+    expect(i + 1).to.equal(encoded.getUint32(4 * i, true))
+  }
+  // default (little)
+  encoded = array({element: uint32(), length: 3}).encode([1, 2, 3])
+  for (let i = 0; i < 3; ++i) {
+    expect(i + 1).to.equal(encoded.getUint32(4 * i, true))
+  }
+  // little
+  encoded = array({element: uint32(), length: 3}).littleEndian().encode([1, 2, 3])
+  for (let i = 0; i < 3; ++i) {
+    expect(i + 1).to.equal(encoded.getUint32(4 * i, true))
+  }
+  // overridden (big)
+  encoded = array({element: uint32().bigEndian(), length: 3}).littleEndian().encode([1, 2, 3])
+  for (let i = 0; i < 3; ++i) {
+    expect(i + 1).to.equal(encoded.getUint32(4 * i, false))
+  }
+})

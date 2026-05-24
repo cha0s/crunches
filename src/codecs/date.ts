@@ -10,7 +10,13 @@ export class CrunchesDate extends CrunchesType<Date, CoercibleToDate> {
   constructor(options?: { varuint?: boolean }) {
     super()
     this.$$string = new CrunchesString(options)
-    this.$$string.isLittleEndian = this.isLittleEndian
+  }
+
+  bigEndian(): this {
+    if (undefined === this.$$string.isLittleEndian) {
+      this.$$string.bigEndian()
+    }
+    return super.bigEndian()
   }
 
   decodeFrom(view: DataView, target: Target): Date {
@@ -19,6 +25,13 @@ export class CrunchesDate extends CrunchesType<Date, CoercibleToDate> {
 
   encodeInto(value: CoercibleToDate, view: DataView, byteOffset: number): number {
     return this.$$string.encodeInto(new Date(value).toISOString(), view, byteOffset)
+  }
+
+  littleEndian(): this {
+    if (undefined === this.$$string.isLittleEndian) {
+      this.$$string.littleEndian()
+    }
+    return super.littleEndian()
   }
 
   sizeOf(value: CoercibleToDate): number {

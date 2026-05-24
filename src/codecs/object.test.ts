@@ -5,8 +5,9 @@ import { type CrunchesBase } from '#types'
 import { object } from './object.ts'
 import { boolean } from './boolean.ts'
 import { uint8 } from './uint8.ts'
+import { uint32 } from './uint32.ts'
 
-test('object', async () => {
+test('object', () => {
   const codec = object({
     1: uint8(),
     2: uint8(),
@@ -15,7 +16,7 @@ test('object', async () => {
   expect(codec.decode(codec.encode(value))).to.deep.equal(value)
 })
 
-test('object boolean coalescence', async () => {
+test('object boolean coalescence', () => {
   let codec
   const properties: Record<string, CrunchesBase<unknown, unknown>> = {}
   const value: Record<string, unknown> = {}
@@ -33,7 +34,7 @@ test('object boolean coalescence', async () => {
   expect(codec.size(value)).to.equal(2)
 })
 
-test('object optional coalescence', async () => {
+test('object optional coalescence', () => {
   let codec
   const properties: Record<string, CrunchesBase<unknown, unknown>> = {}
   const value: Record<string, unknown> = {}
@@ -51,7 +52,7 @@ test('object optional coalescence', async () => {
   expect(codec.size(value)).to.equal(16 + 2)
 })
 
-test('object optional property', async () => {
+test('object optional property', () => {
   const codec = object({
     1: uint8().optional(),
     2: uint8().optional(),
@@ -77,7 +78,7 @@ test('object optional property', async () => {
   expect(codec.decode(codec.encode(value))).to.deep.equal(value)
 })
 
-test('object boolean properties', async () => {
+test('object boolean properties', () => {
   const properties: Record<string, CrunchesBase<unknown, unknown>> = {}
   const value: Record<string, unknown> = {}
   for (let i = 0; i < 8; ++i) {
@@ -88,7 +89,7 @@ test('object boolean properties', async () => {
   expect(codec.decode(codec.encode(value))).to.deep.equal(value)
 })
 
-test('object boolean optional interaction', async () => {
+test('object boolean optional interaction', () => {
   const properties: Record<string, CrunchesBase<unknown, unknown>> = {}
   const value: Record<string, unknown> = {}
   for (let i = 0; i < 8; ++i) {
@@ -97,4 +98,29 @@ test('object boolean optional interaction', async () => {
   const codec = object(properties)
   expect(codec.size(value)).to.equal(1)
   expect(codec.decode(codec.encode(value))).to.deep.equal(value)
+})
+
+test('property endianness', () => {
+  let encoded
+  encoded = object({1: uint32(), 2: uint32()}).encode({1: 123, 2: 234})
+  expect(123).to.equal(encoded.getUint32(0, true))
+  expect(234).to.equal(encoded.getUint32(4, true))
+  encoded = object({1: uint32(), 2: uint32()}).littleEndian().encode({1: 123, 2: 234})
+  expect(123).to.equal(encoded.getUint32(0, true))
+  expect(234).to.equal(encoded.getUint32(4, true))
+  encoded = object({1: uint32().bigEndian(), 2: uint32()}).littleEndian().encode({1: 123, 2: 234})
+  expect(123).to.equal(encoded.getUint32(0, false))
+  expect(234).to.equal(encoded.getUint32(4, true))
+  encoded = object({1: uint32(), 2: uint32().bigEndian()}).littleEndian().encode({1: 123, 2: 234})
+  expect(123).to.equal(encoded.getUint32(0, true))
+  expect(234).to.equal(encoded.getUint32(4, false))
+  encoded = object({1: uint32(), 2: uint32()}).bigEndian().encode({1: 123, 2: 234})
+  expect(123).to.equal(encoded.getUint32(0, false))
+  expect(234).to.equal(encoded.getUint32(4, false))
+  encoded = object({1: uint32().littleEndian(), 2: uint32()}).bigEndian().encode({1: 123, 2: 234})
+  expect(123).to.equal(encoded.getUint32(0, true))
+  expect(234).to.equal(encoded.getUint32(4, false))
+  encoded = object({1: uint32(), 2: uint32().littleEndian()}).bigEndian().encode({1: 123, 2: 234})
+  expect(123).to.equal(encoded.getUint32(0, false))
+  expect(234).to.equal(encoded.getUint32(4, true))
 })

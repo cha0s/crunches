@@ -12,6 +12,13 @@ export class CrunchesSet<E extends CrunchesType<unknown, unknown>>
     this.$$array = new CrunchesArray({ element, length })
   }
 
+  bigEndian(): this {
+    if (undefined === this.$$array.isLittleEndian) {
+      this.$$array.bigEndian()
+    }
+    return super.bigEndian()
+  }
+
   decodeFrom(view: DataView, target: Target): Set<E['_output']> {
     const result = new Set<E['_output']>()
     for (const item of this.$$array.decodeFrom(view, target) as Array<E['_output']>) {
@@ -30,6 +37,13 @@ export class CrunchesSet<E extends CrunchesType<unknown, unknown>>
       entries.push(item)
     }
     return this.$$array.encodeInto(entries as any, view, byteOffset)
+  }
+
+  littleEndian(): this {
+    if (undefined === this.$$array.isLittleEndian) {
+      this.$$array.littleEndian()
+    }
+    return super.littleEndian()
   }
 
   sizeOf(

@@ -4,7 +4,7 @@ import { varint } from './varint.ts'
 
 const codec = varint()
 
-test('varint', async () => {
+test('varint', () => {
   let value
   let view
   let written
@@ -22,7 +22,7 @@ test('varint', async () => {
   }
 })
 
-test('varint sizes', async () => {
+test('varint sizes', () => {
   expect(codec.size(0)).to.equal(1)
   for (let i = 0; i < 5; ++i) {
     const value = 64 * 0 === i ? 0 : Math.pow(2, i * 7)
@@ -31,7 +31,7 @@ test('varint sizes', async () => {
   }
 })
 
-test('varint boundaries', async () => {
+test('varint boundaries', () => {
   let value
   value = -Math.pow(2, 31) - 1
   // fail (wrap)

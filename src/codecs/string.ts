@@ -13,7 +13,13 @@ export class CrunchesString extends CrunchesType<string> {
   constructor({ varuint = false }: { varuint?: boolean } = {}) {
     super()
     this.prefix = varuint ? new CrunchesVarUint() : new CrunchesUint32()
-    this.prefix.isLittleEndian = this.isLittleEndian
+  }
+
+  bigEndian(): this {
+    if (undefined === this.prefix.isLittleEndian) {
+      this.prefix.bigEndian()
+    }
+    return super.bigEndian()
   }
 
   decodeFrom(view: DataView, target: Target) {
@@ -34,6 +40,13 @@ export class CrunchesString extends CrunchesType<string> {
     )
     this.prefix.encodeInto(written, view, byteOffset)
     return prefixLength + written
+  }
+
+  littleEndian(): this {
+    if (undefined === this.prefix.isLittleEndian) {
+      this.prefix.littleEndian()
+    }
+    return super.littleEndian()
   }
 
   sizeOf(value: string) {
