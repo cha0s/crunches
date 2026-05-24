@@ -102,7 +102,7 @@ You may `encodeInto` a view over any existing `ArrayBuffer` **provided that it's
 
 ### `object`
 
-Requires a `properties` key to define the properties on the object. Supports [`optional` fields](#optional-fields). Booleans are [coalesced](#boolean-coalescence).
+Requires a properties object. Supports [`optional` fields](#optional-fields). Booleans are [coalesced](#boolean-coalescence).
 
 Example:
 
