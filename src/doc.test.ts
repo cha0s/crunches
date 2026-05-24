@@ -1,0 +1,186 @@
+import { describe, expect, test } from 'vitest'
+
+import { CrunchesType, type Target } from '#types'
+
+import { array } from './codecs/array.ts'
+import { boolean } from './codecs/boolean.ts'
+import { float32 } from './codecs/float32.ts'
+import { int32 } from './codecs/int32.ts'
+import { map } from './codecs/map.ts'
+import { object } from './codecs/object.ts'
+import { set } from './codecs/set.ts'
+import { CrunchesString, string } from './codecs/string.ts'
+import { uint8 } from './codecs/uint8.ts'
+import { uint32 } from './codecs/uint32.ts'
+import { varuint } from './codecs/varuint.ts'
+
+describe('documentation', () => {
+
+  const playerSchema = object({
+    position: array({
+      element: float32(),
+      length: 3,
+    }),
+    health: varuint(),
+    jumping: boolean(),
+    attributes: object({
+      str: uint8(),
+      agi: uint8(),
+      int: uint8(),
+    }),
+  })
+
+  const player = {
+    position: [-540.2378623, 343.183749, 1201.23897468],
+    health: 4000,
+    jumping: false,
+    attributes: {str: 87, agi: 42, int: 22},
+  }
+
+  test('player schema', () => {
+    const view = playerSchema.encode(player)
+    const decoded = playerSchema.decode(view)
+    expect(decoded.health).to.deep.equal(player.health)
+    expect(decoded.jumping).to.deep.equal(player.jumping)
+    expect(decoded.attributes).to.deep.equal(player.attributes)
+    for (let i = 0; i < 3; ++i) {
+      expect(decoded.position[i]).to.be.closeTo(player.position[i], 0.01)
+    }
+  })
+
+  test('unsugar 1', () => {
+    // create a view for our value
+    const view = playerSchema.allocate(player)
+    // pass the view to the encoder
+    playerSchema.encodeInto(player, view, 0)
+  })
+
+  test('unsugar 2', () => {
+    // get the schema size
+    const size = playerSchema.size(player)
+    // allocate a buffer
+    const buffer = new ArrayBuffer(size)
+    // create a view over the buffer
+    const view = new DataView(buffer)
+    // pass the view to the encoder
+    playerSchema.encodeInto(player, view, 0)
+  })
+
+  test('object', () => {
+    const schema = object({
+      foo: uint32(),
+      bar: string().optional(),
+    })
+    // 14 = uint32 (4) + optional flag (1) + string prefix (4) + 'hello' (5)
+    expect(schema.size({foo: 32, bar: 'hello'})).to.equal(14)
+    // 5 = uint32 (4) + optional flag (1)
+    expect(schema.size({foo: 32})).to.equal(5)
+  })
+
+  test('array', () => {
+    // 16 = array prefix (4) + uint32 (4) + uint32 (4) + uint32 (4)
+    expect(array({element: uint32()}).size([1, 2, 3])).to.equal(16)
+    // 12 = uint32 (4) + uint32 (4) + uint32 (4)
+    expect(array({element: uint32(), length: 3}).size([1, 2, 3])).to.equal(12)
+  })
+
+
+  test('map', () => {
+    const schema = map({
+      key: int32(),
+      value: string(),
+    })
+    const value = new Map<number, string>()
+    value.set(32, 'sup')
+    value.set(64, 'hi')
+    // 25 = array prefix (4) + int32 (4) + string prefix (4) + 'sup' (3) + int32 (4) + string prefix (4) + 'hi' (2)
+    expect(schema.size(value)).to.equal(25)
+    // same, with coercion
+    expect(schema.size([[32, 'sup'], [64, 'hi']])).to.equal(25)
+  })
+
+  test('set', () => {
+    const schema = set({
+      element: string(),
+    })
+    const value = new Set<string>()
+    value.add('foo')
+    value.add('bar')
+    // 18 = array prefix (4) + string prefix (4) + 'foo' (3) + string prefix (4) + 'bar' (3)
+    expect(schema.size(value)).to.equal(18)
+    // same, with coercion
+    expect(schema.size(['foo', 'bar'])).to.equal(18)
+  })
+
+  test('optional size', () => {
+    const stateSchema = object({
+      position: array({
+        element: float32(),
+        length: 3,
+      }).optional(),
+      health: varuint().optional(),
+      jumping: boolean().optional(),
+      attributes: object({
+        str: uint8(),
+        agi: uint8(),
+        int: uint8(),
+      }).optional(),
+    })
+    expect(stateSchema.size({})).to.equal(1)
+  })
+
+  test('varuint prefixes', () => {
+    const schema = string({
+      varuint: true,
+    })
+    // 6 = varuint prefix (1) + 'hello' (5)
+    expect(schema.size('hello')).to.equal(6)
+  })
+
+  test('extensibile', () => {
+    class MySuperCustomDate extends CrunchesType<Date, Date | string | number> {
+      private readonly $$string: CrunchesString
+
+      constructor() {
+        super()
+        this.$$string = new CrunchesString()
+        this.$$string.isLittleEndian = this.isLittleEndian
+      }
+
+      decodeFrom(view: DataView, target: Target): Date {
+        return new Date(this.$$string.decodeFrom(view, target))
+      }
+
+      encodeInto(
+        value: Date | string | number,
+        view: DataView,
+        byteOffset: number,
+      ): number {
+        return this.$$string.encodeInto(new Date(value).toISOString(), view, byteOffset)
+      }
+
+      sizeOf(value: Date | string | number): number {
+        return this.$$string.sizeOf(new Date(value).toISOString())
+      }
+    }
+
+    const mySuperCustomDate = () => new MySuperCustomDate()
+
+    const schema = object({
+      name: string(),
+      when: mySuperCustomDate(),
+    })
+
+    const encoded = schema.encode({
+      name: 'John Doe',
+      when: 1234567890123,
+    })
+
+    expect(schema.decode(encoded)).to.deep.equal({
+      name: 'John Doe',
+      when: new Date('2009-02-13T23:31:30.123Z')
+    })
+  })
+
+})
+

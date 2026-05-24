@@ -1,37 +1,35 @@
 {
-  "author": "cha0s",
   "devDependencies": {
-    "@vitest/coverage-v8": "^1.6.0",
-    "eslint": "^8.38.0",
-    "eslint-plugin-import": "^2.28.1",
-    "eslint-plugin-jsx-a11y": "^6.7.1",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
+    "@microsoft/api-extractor": "^7.58.7",
+    "@types/node": "^25.6.0",
+    "@vitest/coverage-v8": "^4.1.4",
+    "dts-bundle-generator": "^9.5.1",
     "schemapack": "^1.4.2",
-    "vite": "^5.1.0",
-    "vitest": "^1.6.0"
+    "tsx": "^4.22.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.4",
+    "vitest": "^4.1.4"
   },
-  "engines": {
-    "node": ">=20.0.0"
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
-  "exports": "./dist/index.js",
   "files": [
     "dist"
   ],
-  "license": "MIT",
-  "main": "./dist/index.umd.cjs",
-  "name": "crunches",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cha0s/crunches.git"
+  "imports": {
+    "#types": "./src/types.ts"
   },
+  "module": "./dist/index.js",
+  "name": "crunches",
   "scripts": {
-    "build": "vite build",
-    "ci": "act -W .github/workflows/ci.yml",
-    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
+    "benchmark": "npx tsx benchmark/run.ts",
+    "build": "vite build && tsc && dts-bundle-generator --out-file dist/index.d.ts src/index.ts",
     "test": "vitest src"
   },
-  "sideEffects": false,
   "type": "module",
+  "types": "./dist/index.d.ts",
   "version": "2.1.0"
 }
