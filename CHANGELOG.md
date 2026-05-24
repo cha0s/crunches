@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.0.1](https://github.com/cha0s/crunches/compare/crunches-v3.0.0...crunches-v3.0.1) (2026-05-24)
+
+
+### Bug Fixes
+
+* doc ([d7cead1](https://github.com/cha0s/crunches/commit/d7cead1ac8fb8c3884f187ceee1fc6e1f07b9aad))
+* endianness ([f178628](https://github.com/cha0s/crunches/commit/f1786288a9c370e2756464f6522f0db8bf6456c0))
+
 ## [3.0.0](https://github.com/cha0s/crunches/compare/crunches-v2.1.0...crunches-v3.0.0) (2026-05-24)
 
 
