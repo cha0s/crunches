@@ -279,9 +279,14 @@ export class MySuperCustomDate
   constructor() {
     super()
     this.$$string = new CrunchesString()
+  }
 
-    // make sure to propagate endianness to "child" codecs
-    this.$$string.isLittleEndian = this.isLittleEndian
+  // propagate endianness to any "child" codecs
+  bigEndian(): this {
+    if (undefined === this.$$string.isLittleEndian) {
+      this.$$string.bigEndian()
+    }
+    return super.bigEndian()
   }
 
   decodeFrom(view: DataView, target: Target): Date {
@@ -290,6 +295,14 @@ export class MySuperCustomDate
 
   encodeInto(value: CoercibleToDate, view: DataView, byteOffset: number): number {
     return this.$$string.encodeInto(new Date(value).toISOString(), view, byteOffset)
+  }
+
+  // propagate endianness to any "child" codecs
+  littleEndian(): this {
+    if (undefined === this.$$string.isLittleEndian) {
+      this.$$string.littleEndian()
+    }
+    return super.littleEndian()
   }
 
   sizeOf(value: CoercibleToDate): number {
