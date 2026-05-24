@@ -388,7 +388,7 @@ A similar performance gain is also used for arrays. The fast path is used for ar
 
 Instead of copying the data from the buffer, a [`TypedArray`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays#typed_array_views) is created over the encoded binary and returned instead. The same optimization is applied for encoding. This is roughly **1.5x** faster for encoding and ***50x*** faster for decoding a 1024-byte array on the machine used to benchmark. The gains increase even more as the size of the array increases.
 
-**NOTE:** `float64` arrays are padded with an extra 4 bytes after the length prefix to satisfy the required 8-byte alignment.
+**NOTE:** `TypedArray`s are padded with extra bytes if necessary to satisfy the [required alignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray#byteoffset_must_be_aligned).
 
 # Q/A
 
