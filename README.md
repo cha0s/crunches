@@ -250,10 +250,9 @@ implementation of `TypedArray`. This may be overridden on any crunches type:
 
 ```ts
 const stateSchema = object({
-  accumulator: uint32().littleEndian(), // children may override their endianness
-  tag: string(),
-  health: varuint().optional(), // by default, properties inherit the endianness of their parent
-  name: string(),
+  health: varuint(), // by default, properties inherit the endianness of their parent
+  strength: varuint(), // so, these properties are big endian
+  accumulator: uint32().littleEndian(), // but children may override their endianness
 }).bigEndian(); // the object is big endian
 ```
 
@@ -283,6 +282,7 @@ export class MySuperCustomDate
 
   // propagate endianness to any "child" codecs
   bigEndian(): this {
+    // only propagate if the child hasn't overridden its endianness
     if (undefined === this.$$string.isLittleEndian) {
       this.$$string.bigEndian()
     }
@@ -299,6 +299,7 @@ export class MySuperCustomDate
 
   // propagate endianness to any "child" codecs
   littleEndian(): this {
+    // only propagate if the child hasn't overridden its endianness
     if (undefined === this.$$string.isLittleEndian) {
       this.$$string.littleEndian()
     }
