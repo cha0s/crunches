@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/cha0s/crunches/compare/crunches-v2.1.0...crunches-v3.0.0) (2026-05-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* major refactor
+
+### Features
+
+* major refactor ([7c9166f](https://github.com/cha0s/crunches/commit/7c9166feb6fd754375ebd2c925f4f63f4996a6ea))
+
 ## [2.1.0](https://github.com/cha0s/crunches/compare/crunches-v2.0.4...crunches-v2.1.0) (2025-05-29)
 
 
