@@ -245,7 +245,7 @@ bytes of space.
 
 ### Endianness
 
-`crunches` defaults to little-endian byte ordering to align with the majority of machines'
+`crunches` defaults to little-endian byte ordering to align with the majority of architectures'
 implementation of `TypedArray`. This may be overridden on any crunches type:
 
 ```ts
@@ -367,7 +367,7 @@ I also wanted an implementation that does amazing things like [boolean coalescen
 
 When defining arrays, the elements are all the same type. There is no mixing of types. If you need this, you might consider using an array of objects (which themselves maybe contain arrays).
 
-### Varuint prefixes
+### Prefixes
 
 SchemaPack uses `varuint` prefixes for arrays, buffers, and strings. For speed, `crunches` uses 32-bit prefixes by default. A `varuint` prefix may be used for buffers and strings by providing a `varuint` key in the schema blueprint:
 
@@ -408,3 +408,19 @@ Instead of copying the data from the buffer, a [`TypedArray`](https://developer.
 
 **Q**: Why did you call it `crunches`?  
 **A**: 'cuz you gotta crunch those flabby AB(`ArrayBuffer`)s! 😋
+
+# Benchmark
+
+For entertainment purposes only.
+
+```
+> npx tsx benchmark/run.ts
+
+encoding x 10000
+  SchemaPack             342.09 ms
+  crunches (encodeInto)	 154.93 ms
+  crunches (encode)	     250.44 ms
+decoding x 10000
+  SchemaPack             221.75 ms
+  crunches               118.27 ms
+```
