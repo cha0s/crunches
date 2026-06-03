@@ -13,7 +13,7 @@ export class CrunchesMap <
   >
 {
 
-  private readonly $$array: CrunchesArray<CrunchesObject<{ key: K; value: V }>>
+  protected $$array: CrunchesArray<CrunchesObject<{ key: K; value: V }>>
 
   constructor({ key, value }: { key: K; value: V; }) {
     super()
