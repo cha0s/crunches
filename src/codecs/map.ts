@@ -9,7 +9,7 @@ export class CrunchesMap <
 >
   extends CrunchesType<
     Map<K['_output'], V['_output']>,
-    Map<K['_input'], V['_input']> | Iterable<Iterable<K['_input'] | V['_input']>>
+    Map<K['_input'], V['_input']> | Iterable<[K['_input'], V['_input']]>
   >
 {
 
@@ -38,7 +38,7 @@ export class CrunchesMap <
   }
 
   encodeInto(
-    value: Map<K['_input'], V['_input']> | Iterable<Iterable<K['_input'] | V['_input']>>,
+    value: Map<K['_input'], V['_input']> | Iterable<[K['_input'], V['_input']]>,
     view: DataView,
     byteOffset: number,
   ): number {
@@ -57,7 +57,7 @@ export class CrunchesMap <
   }
 
   sizeOf(
-    value: Map<K['_input'], V['_input']> | Iterable<Iterable<K['_input'] | V['_input']>>,
+    value: Map<K['_input'], V['_input']> | Iterable<[K['_input'], V['_input']]>,
     byteOffset: number
   ): number {
     const entries: Array<{ key: K['_input']; value: V['_input'] }> = []

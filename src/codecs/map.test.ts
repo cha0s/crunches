@@ -13,12 +13,12 @@ test('map', () => {
 
 test('coerce map', () => {
   const codec = map({ key: uint8(), value: string() })
-  const value = [[1, 'one'], [2, 'two']]
+  const value = [[1, 'one'], [2, 'two']] as Iterable<[number, string]>
   expect(codec.decode(codec.encode(value))).to.deep.equal(new Map(value as [number, string][]))
 })
 
 test('prefix endianness', () => {
-  const value = [[1, 'one'], [2, 'two']]
+  const value = [[1, 'one'], [2, 'two']] as Iterable<[number, string]>
   let encoded
   // big
   encoded = map({ key: uint8(), value: string() }).bigEndian().encode(value)
@@ -32,7 +32,7 @@ test('prefix endianness', () => {
 })
 
 test('key endianness', () => {
-  const value = [[1, 'one'], [2, 'two']]
+  const value = [[1, 'one'], [2, 'two']] as Iterable<[number, string]>
   let encoded
   // little
   encoded = map({ key: uint32().littleEndian(), value: string() }).encode(value)
@@ -56,7 +56,7 @@ test('key endianness', () => {
 })
 
 test('value endianness', () => {
-  const value = [[1, 'one'], [2, 'two']]
+  const value = [[1, 'one'], [2, 'two']] as Iterable<[number, string]>
   let encoded
   // little
   encoded = map({ key: uint32(), value: string().littleEndian() }).encode(value)
