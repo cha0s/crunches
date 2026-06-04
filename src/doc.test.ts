@@ -13,6 +13,7 @@ import { CrunchesString, string } from './codecs/string.ts'
 import { uint8 } from './codecs/uint8.ts'
 import { uint32 } from './codecs/uint32.ts'
 import { varuint } from './codecs/varuint.ts'
+import { Protocol, type ProtocolInfer } from './protocol.ts'
 
 describe('documentation', () => {
 
@@ -117,6 +118,57 @@ describe('documentation', () => {
     expect(schema.size(value)).to.equal(18)
     // same, with coercion
     expect(schema.size(['foo', 'bar'])).to.equal(18)
+  })
+
+  test('protocol', () => {
+    type Listener = (event: MessageEvent) => void
+    const socket: {
+      addEventListener: (_type: string, fn: Listener) => void,
+      listener: Listener,
+      send: (view: DataView) => void,
+    } = {
+      addEventListener(_type: string, fn: Listener) {
+        this.listener = fn
+      },
+      listener: () => {},
+      send(view: DataView) {
+        this.listener(new MessageEvent('message', { data: view.buffer }))
+      },
+    }
+
+    const protocol = new Protocol({
+      heartbeat: uint32(),
+      message: object({
+        body: string(),
+        from: string().optional(),
+      }),
+    })
+
+    let lastReceivedHeartbeat: number = 0
+    // infer payload type
+    const messages: ProtocolInfer<typeof protocol, 'message'>[] = [];
+    socket.addEventListener('message', (event: MessageEvent) => {
+      const { type, payload } = protocol.decode(new DataView(event.data));
+      switch (type) {
+        case 'heartbeat': {
+          lastReceivedHeartbeat = payload
+          break
+        }
+        case 'message': {
+          messages.push(payload)
+          break
+        }
+      }
+    })
+
+    socket.send(protocol.encode('heartbeat', 1234))
+    socket.send(protocol.encode('message', {
+      body: 'Hello!',
+      from: 'admin',
+    }))
+
+    expect(lastReceivedHeartbeat).to.equal(1234)
+    expect(messages).to.deep.equal([{body: 'Hello!', from: 'admin'}])
   })
 
   test('optional size', () => {

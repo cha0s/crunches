@@ -2,7 +2,7 @@
 
 # crunches :muscle: 
 
-The smallest **and** fastest TypeScript web standards-compliant value serialization library in the wild. **3.64 KiB** gzipped; **0 dependencies**. Strongly-typed and still works fine in plain JS. Efficiently encode and decode your values to and from `ArrayBuffer`s. Integrates very well with WebSockets.
+The smallest **and** fastest TypeScript web standards-compliant value serialization library in the wild. **4.09 KiB** gzipped; **0 dependencies**. Strongly-typed and still works fine in plain JS. Efficiently encode and decode your values to and from `ArrayBuffer`s. Integrates very well with WebSockets.
 
 ## Example
 
@@ -244,6 +244,78 @@ expect(schema.size(['foo', 'bar'])).to.equal(18)
 ```
 
 ## :fire: features
+
+### Protocols
+
+So, you've implemented a couple of packet schemas like:
+
+```ts
+const heartbeat = uint8()
+
+const message = object({
+  body: string(),
+  from: string().optional(),
+  channel: string(),
+})
+```
+
+and now you want to be able to send either schema over a WebSocket to clients. You might think, "I'll add a `varuint` ID for each packet and send it before each packet type so that the client knows which schema to decode".
+
+That's such a common pattern that `crunches` provides a helper for this: `Protocol`!
+
+We could write the above packet schemas like so:
+
+```ts
+
+import { object, Protocol, string, uint32 } from 'crunches'
+
+const protocol = new Protocol({
+  heartbeat: uint32(),
+  message: object({
+    body: string(),
+    from: string().optional(),
+  }),
+})
+```
+
+(and probably a lot more)...
+
+Now, you can write on the client:
+
+```ts
+import { type ProtocolInfer } from 'crunches'
+
+let lastReceivedHeartbeat: number = 0
+const messages: ProtocolInfer<typeof protocol, 'message'>[] = []; // infer message payload type
+
+socket.addEventListener('message', (event: MessageEvent) => {
+  const { type, payload } = protocol.decode(new DataView(event.data));
+  switch (type) {
+    case 'heartbeat': {
+      lastReceivedHeartbeat = payload
+      break
+    }
+    case 'message': {
+      messages.push(payload)
+      break
+    }
+  }
+})
+```
+
+and then on the server:
+
+```ts
+socket.send(protocol.encode('heartbeat', 1234))
+socket.send(protocol.encode('message', {
+  body: 'Hello!',
+  from: 'admin',
+}))
+```
+
+No messing with packet IDs or anything, `crunches` handles it all for you!
+
+Under the hood, `crunches` encodes the packet ID as `varuint`, so the overhead will only be 1 byte until you have more than 127 packet types. Not bad!
 
 ### Boolean coalescence
 

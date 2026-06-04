@@ -19,4 +19,5 @@ export * from './codecs/uint8.ts'
 export * from './codecs/varint.ts'
 export * from './codecs/varuint.ts'
 
+export * from './protocol.ts'
 export * from './types.ts'
