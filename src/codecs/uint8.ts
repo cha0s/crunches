@@ -2,7 +2,7 @@ import { CrunchesNumeric, type Target } from '#types'
 
 export class CrunchesUint8 extends CrunchesNumeric {
   readonly byteWidth = 1
-  readonly elementClass = Uint8Array
+  readonly typedArray = Uint8Array
   decodeFrom(view: DataView, target: Target) {
     const value = view.getUint8(target.byteOffset)
     target.byteOffset += 1

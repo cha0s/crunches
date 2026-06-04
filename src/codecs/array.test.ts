@@ -38,11 +38,11 @@ for (const numberType of [
   const numbers = [1, 2, 3, 4]
   const testNumberArray = (codec: CrunchesArray<any>, value: Iterable<number>) => {
     expect(codec.decode(codec.encode(value))).to.deep.equal(
-      new element.elementClass(value),
+      new element.typedArray(value),
     )
   }
   test(`${numberType.name} typed array`, () => {
-    testNumberArray(codec, new element.elementClass(numbers))
+    testNumberArray(codec, new element.typedArray(numbers))
   })
   test(`${numberType.name} array`, () => {
     testNumberArray(codec, numbers)
@@ -51,7 +51,7 @@ for (const numberType of [
     testNumberArray(codec, new Set(numbers))
   })
   test(`${numberType.name} fixed-length typed array`, () => {
-    testNumberArray(fixedLengthCodec, new element.elementClass(numbers))
+    testNumberArray(fixedLengthCodec, new element.typedArray(numbers))
   })
   test(`${numberType.name} fixed-length array`, () => {
     testNumberArray(fixedLengthCodec, numbers)
@@ -65,7 +65,7 @@ for (const numberType of [
       sparse: true,
     })
     const value = [1, 2, , 4]
-    const sparseValue = new element.elementClass([
+    const sparseValue = new element.typedArray([
       1,
       2,
       (numberType === float32) || (numberType === float64) ? NaN : 0,
@@ -75,7 +75,7 @@ for (const numberType of [
   })
   test(`sparse ${numberType.name} fixed-length array`, () => {
     const value = [1, 2, , 4]
-    const sparseValue = new element.elementClass([
+    const sparseValue = new element.typedArray([
       1,
       2,
       (numberType === float32) || (numberType === float64) ? NaN : 0,
@@ -124,11 +124,11 @@ for (const numberType of [
   })
   const testNumberArray = (value: Iterable<bigint>) => {
     expect(codec.decode(codec.encode(value))).to.deep.equal(
-      new element.elementClass(value),
+      new element.typedArray(value),
     )
   }
   test(`${numberType.name} typed array`, () => {
-    testNumberArray(new element.elementClass([1n, 2n, 3n, 4n]))
+    testNumberArray(new element.typedArray([1n, 2n, 3n, 4n]))
   })
   test(`${numberType.name} array`, () => {
     testNumberArray([1n, 2n, 3n, 4n])
@@ -296,7 +296,7 @@ for (const numberType of [
       offset: int8(),
       array: array({element}),
     })
-    const value = {offset: 0, array: new element.elementClass([0, 1, 2])}
+    const value = {offset: 0, array: new element.typedArray([0, 1, 2])}
     expect(codec.decode(codec.encode(value)).array).to.deep.equal(value.array)
   })
   test(`aligned ${numberType.name} iterable`, () => {
@@ -320,7 +320,7 @@ for (const numberType of [
       offset: int8(),
       array: array({element, length: 3}),
     })
-    const value = {offset: 0, array: new element.elementClass([0, 1, 2])}
+    const value = {offset: 0, array: new element.typedArray([0, 1, 2])}
     expect(codec.decode(codec.encode(value)).array).to.deep.equal(value.array)
   })
   test(`aligned fixed-length ${numberType.name} iterable`, () => {
@@ -351,7 +351,7 @@ for (const numberType of [
       offset: int8(),
       array: array({element}),
     })
-    const value = {offset: 0, array: new element.elementClass([0n, 1n, 2n])}
+    const value = {offset: 0, array: new element.typedArray([0n, 1n, 2n])}
     expect(codec.decode(codec.encode(value)).array).to.deep.equal(value.array)
   })
   test(`aligned ${numberType.name} iterable`, () => {
@@ -375,7 +375,7 @@ for (const numberType of [
       offset: int8(),
       array: array({element, length: 3}),
     })
-    const value = {offset: 0, array: new element.elementClass([0n, 1n, 2n])}
+    const value = {offset: 0, array: new element.typedArray([0n, 1n, 2n])}
     expect(codec.decode(codec.encode(value)).array).to.deep.equal(value.array)
   })
   test(`aligned fixed-length ${numberType.name} iterable`, () => {

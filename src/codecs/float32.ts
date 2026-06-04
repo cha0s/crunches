@@ -2,7 +2,7 @@ import { CrunchesNumeric, type Target } from '#types'
 
 export class CrunchesFloat32 extends CrunchesNumeric {
   readonly byteWidth = 4
-  readonly elementClass = Float32Array
+  readonly typedArray = Float32Array
   decodeFrom(view: DataView, target: Target) {
     const value = view.getFloat32(target.byteOffset, this.isLittleEndian ?? true)
     target.byteOffset += 4

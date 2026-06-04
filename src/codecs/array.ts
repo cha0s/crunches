@@ -9,7 +9,7 @@ import { boolean, type CrunchesBoolean } from './boolean'
 import { CrunchesUint8, uint8 } from './uint8'
 
 type TypedArrayFor<E extends CrunchesNumeric<number | bigint>> =
-  InstanceType<E['elementClass']>
+  InstanceType<E['typedArray']>
 
 type MaybeUndefined<T, IsSparse> = IsSparse extends true
   ? T | undefined
@@ -38,10 +38,10 @@ function isNumeric(codec: CrunchesType<unknown, unknown>): codec is CrunchesNume
 }
 
 function canBeEncodedAsTypedArray(codec: CrunchesType<any>, wasSparseRequested: boolean, value: any) {
-  const { elementClass } = codec as any
+  const { typedArray } = codec as any
   return (
-    elementClass
-    && (!wasSparseRequested || ((BigInt64Array !== elementClass) && (BigUint64Array !== elementClass)))
+    typedArray
+    && (!wasSparseRequested || ((BigInt64Array !== typedArray) && (BigUint64Array !== typedArray)))
     && false !== codec.isLittleEndian
     && (Array.isArray(value) || ArrayBuffer.isView(value))
   )
@@ -55,7 +55,7 @@ export class CrunchesArray<
 {
 
   $$elementCodec: CrunchesType<unknown>
-  $$elementClass: TypedArrayConstructor | undefined
+  $$typedArray: TypedArrayConstructor | undefined
   $$isDenseCodec: CrunchesBoolean
   $$isPossiblySparse: boolean
   $$length: number
@@ -64,12 +64,11 @@ export class CrunchesArray<
   constructor({ element, length = 0, sparse = false as IsSparse }: { element: E; length?: number; sparse?: IsSparse }) {
     super()
     this.$$elementCodec = element
-    const elementClass = isNumeric(element) ? element.elementClass : undefined
-    this.$$elementClass = elementClass
+    this.$$typedArray = isNumeric(element) ? element.typedArray : undefined
     this.$$isDenseCodec = boolean()
     this.$$isPossiblySparse = sparse
-    this.$$presenceCodec = (sparse ? array({ element: uint8() }) : undefined) as any
     this.$$length = length
+    this.$$presenceCodec = (sparse ? array({ element: uint8() }) : undefined) as any
   }
 
   bigEndian(): this {
@@ -104,12 +103,12 @@ export class CrunchesArray<
     }
     // static shape
     if (
-      this.$$elementClass
-      && (!this.$$isPossiblySparse || ((BigInt64Array !== this.$$elementClass) && (BigUint64Array !== this.$$elementClass)))
+      this.$$typedArray
+      && (!this.$$isPossiblySparse || ((BigInt64Array !== this.$$typedArray) && (BigUint64Array !== this.$$typedArray)))
     ) {
       target.byteOffset += this.$$elementCodec.padding(target.byteOffset)
-      const value = new this.$$elementClass(view.buffer as ArrayBuffer, view.byteOffset + target.byteOffset, length)
-      target.byteOffset += this.$$elementClass.BYTES_PER_ELEMENT * length
+      const value = new this.$$typedArray(view.buffer as ArrayBuffer, view.byteOffset + target.byteOffset, length)
+      target.byteOffset += this.$$typedArray.BYTES_PER_ELEMENT * length
       return value as CrunchesArrayOutput<E, IsSparse>
     }
     // dynamic shape
@@ -156,18 +155,18 @@ export class CrunchesArray<
         }
       }
       else {
-        if (this.$$elementClass) {
+        if (this.$$typedArray) {
           written += this.$$elementCodec.padding(byteOffset + written)
         }
         // TypedArray
         if (canBeEncodedAsTypedArray(this.$$elementCodec, this.$$isPossiblySparse, value)) {
           length = (value as E['_input']).length
-          new this.$$elementClass!(
+          new this.$$typedArray!(
             view.buffer as ArrayBuffer,
             view.byteOffset + byteOffset + written,
             length,
-          ).set(Array.isArray(value) ? new this.$$elementClass!(value) : value as any)
-          written += this.$$elementClass!.BYTES_PER_ELEMENT * length
+          ).set(Array.isArray(value) ? new this.$$typedArray!(value) : value as any)
+          written += this.$$typedArray!.BYTES_PER_ELEMENT * length
         }
         // dynamic shape, big endian, iterator
         else {
@@ -202,17 +201,17 @@ export class CrunchesArray<
         }
       }
       else {
-        if (this.$$elementClass) {
+        if (this.$$typedArray) {
           written += this.$$elementCodec.padding(byteOffset + written)
         }
         // TypedArray
         if (canBeEncodedAsTypedArray(this.$$elementCodec, this.$$isPossiblySparse, value)) {
-          new this.$$elementClass!(
+          new this.$$typedArray!(
             view.buffer as ArrayBuffer,
             view.byteOffset + byteOffset + written,
             this.$$length,
-          ).set(Array.isArray(value) ? new this.$$elementClass!(value) : value as any)
-          written += this.$$elementClass!.BYTES_PER_ELEMENT * this.$$length
+          ).set(Array.isArray(value) ? new this.$$typedArray!(value) : value as any)
+          written += this.$$typedArray!.BYTES_PER_ELEMENT * this.$$length
         }
         // dynamic shape, big endian, iterator
         else {
@@ -266,16 +265,16 @@ export class CrunchesArray<
         size += 4 + Math.ceil(i / 8)
       }
       else {
-        if (this.$$elementClass) {
+        if (this.$$typedArray) {
           size += this.$$elementCodec.padding(byteOffset + size)
         }
         // TypedArray
         if (canBeEncodedAsTypedArray(this.$$elementCodec, this.$$isPossiblySparse, value)) {
           if (Array.isArray(value)) {
-            return size + value.length * this.$$elementClass!.BYTES_PER_ELEMENT
+            return size + value.length * this.$$typedArray!.BYTES_PER_ELEMENT
           }
           if (value instanceof Set) {
-            return size + value.size * this.$$elementClass!.BYTES_PER_ELEMENT
+            return size + value.size * this.$$typedArray!.BYTES_PER_ELEMENT
           }
           for (const element of value) {
             size += this.$$elementCodec.sizeOf(element, byteOffset + size)
@@ -307,12 +306,12 @@ export class CrunchesArray<
         size += 4 + Math.ceil(this.$$length / 8)
       }
       else {
-        if (this.$$elementClass) {
+        if (this.$$typedArray) {
           size += this.$$elementCodec.padding(byteOffset + size)
         }
         // TypedArray
         if (canBeEncodedAsTypedArray(this.$$elementCodec, this.$$isPossiblySparse, value)) {
-          size += this.$$length * this.$$elementClass!.BYTES_PER_ELEMENT
+          size += this.$$length * this.$$typedArray!.BYTES_PER_ELEMENT
         }
         // iterable
         else {

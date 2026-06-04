@@ -97,7 +97,7 @@ export type TypedArrayConstructor =
 export abstract class CrunchesNumeric<Output extends number | bigint = number>
   extends CrunchesType<Output> {
   abstract readonly byteWidth: number
-  abstract readonly elementClass: TypedArrayConstructor
+  abstract readonly typedArray: TypedArrayConstructor
   // TypedArray requires padding to align with element width
   padding(byteOffset: number): number {
     if (0 === this.byteWidth) return 0

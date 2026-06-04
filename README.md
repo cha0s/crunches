@@ -556,10 +556,10 @@ For entertainment purposes only.
 > npm run benchmark
 
 encoding x 10000
-  SchemaPack	           331.73 ms
-  crunches (encodeInto)	 158.39 ms
-  crunches (encode)	     272.38 ms
-decoding x 10000
-  SchemaPack	           223.71 ms
-  crunches	             125.15 ms
+  SchemaPack              331.73 ms
+  crunches (encodeInto)	  158.39 ms
+  crunches (encode)	      272.38 ms
+decoding x 10000 
+  SchemaPack              223.71 ms
+  crunches	              125.15 ms
 ```
