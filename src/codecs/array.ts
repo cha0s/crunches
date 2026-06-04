@@ -9,11 +9,11 @@ type TypedArrayFor<E extends CrunchesNumeric<number | bigint>> =
   InstanceType<E['elementClass']>
 
 // input type: any iterable of the element's input type
-type ArrayInput<E extends CrunchesType<unknown, unknown>> =
+export type CrunchesArrayInput<E extends CrunchesType<unknown, unknown>> =
   Iterable<E extends CrunchesNumeric<infer N> ? N : E['_input']>
 
 // output type: TypedArray for numeric elements, regular array otherwise
-type ArrayOutput<E extends CrunchesType<unknown, unknown>> =
+export type CrunchesArrayOutput<E extends CrunchesType<unknown, unknown>> =
   E extends CrunchesNumeric<number | bigint> ? TypedArrayFor<E> : Array<E['_output']>
 
 function isNumeric(codec: CrunchesType<unknown, unknown>): codec is CrunchesNumeric<number | bigint> {
@@ -21,13 +21,13 @@ function isNumeric(codec: CrunchesType<unknown, unknown>): codec is CrunchesNume
 }
 
 type ArrayDecodeFunc<E extends CrunchesType<unknown, unknown>> =
-  (view: DataView, target: Target) => ArrayOutput<E>
+  (view: DataView, target: Target) => CrunchesArrayOutput<E>
 
 type ArrayEncodeFunc<E extends CrunchesType<unknown, unknown>> =
-  (value: ArrayInput<E>, view: DataView, byteOffset: number) => number
+  (value: CrunchesArrayInput<E>, view: DataView, byteOffset: number) => number
 
 export class CrunchesArray<E extends CrunchesType<any>>
-  extends CrunchesType<ArrayOutput<E>, ArrayInput<E>>
+  extends CrunchesType<CrunchesArrayOutput<E>, CrunchesArrayInput<E>>
 {
 
   $$decodeFrom!: ArrayDecodeFunc<E>
@@ -35,7 +35,7 @@ export class CrunchesArray<E extends CrunchesType<any>>
   $$elementCodec: CrunchesType<unknown>
   $$elementClass: TypedArrayConstructor | undefined
   $$encodeInto!: ArrayEncodeFunc<E>
-  $$sizeOf!: (value: ArrayInput<E>, byteOffset: number) => number
+  $$sizeOf!: (value: CrunchesArrayInput<E>, byteOffset: number) => number
 
   constructor({ element, length = 0 }: { element: E; length?: number }) {
     super()
@@ -197,7 +197,7 @@ export class CrunchesArray<E extends CrunchesType<any>>
     return this.$$decodeFrom(view, target)
   }
 
-  encodeInto(value: ArrayInput<E>, view: DataView, byteOffset: number) {
+  encodeInto(value: CrunchesArrayInput<E>, view: DataView, byteOffset: number) {
     return this.$$encodeInto(value, view, byteOffset)
   }
 
@@ -208,7 +208,7 @@ export class CrunchesArray<E extends CrunchesType<any>>
     return super.littleEndian()
   }
 
-  sizeOf(value: ArrayInput<E>, byteOffset: number) {
+  sizeOf(value: CrunchesArrayInput<E>, byteOffset: number) {
     return this.$$sizeOf(value, byteOffset)
   }
 
