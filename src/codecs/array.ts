@@ -24,7 +24,6 @@ export class CrunchesArray<E extends CrunchesType<any>>
   extends CrunchesType<CrunchesArrayOutput<E>, CrunchesArrayInput<E>>
 {
 
-  $$elementByteWidth: number
   $$elementCodec: CrunchesType<unknown>
   $$elementClass: TypedArrayConstructor | undefined
   $$length: number
@@ -33,10 +32,9 @@ export class CrunchesArray<E extends CrunchesType<any>>
   constructor({ element, length = 0 }: { element: E; length?: number }) {
     super()
     this.$$elementCodec = element
-    this.$$elementByteWidth = isNumeric(element) ? element.byteWidth : 0
-    this.$$elementClass = isNumeric(element) ? element.elementClass : undefined
+    const elementClass = isNumeric(element) ? element.elementClass : undefined
+    this.$$elementClass = elementClass
     this.$$length = length
-    const elementClass = this.$$elementClass
     // varlen
     if (0 === length) {
       if (elementClass) {
