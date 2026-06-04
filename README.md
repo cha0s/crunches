@@ -173,26 +173,29 @@ const schema = array({
 As the name implies, this allows sparse arrays such as:
 
 ```ts
-// 23 =
+// 24 =
 //   array prefix    (4) +
+//   sparse flag     (1) +
 //   presence length (4) +
 //   3 presence bits (1) +
 //   string length   (4) +
 //   'foo'           (3) +
 //   string length   (4) +
 //   'bar'           (3)
-expect(schema.size(['foo', , 'bar'])).to.equal(23)
+expect(schema.size(['foo', , 'bar'])).to.equal(24)
 ```
 
 A coalesced bitmap is encoded after the 32-bit prefix and before the values, similarly to how [booleans are coalesced](#boolean-coalescence). That's why the example above only uses 1 byte to encode the presence of 3 elements.
 
 A couple notes about sparse arrays:
 
-- For performance, little-endian numeric types (except `int64` and `uint64`) that are passed an actual `Array` or `TypedArray` will never encode holes. The integer types will replace holes with `0` and the float types will replace holes with `NaN`.
+- A 1-byte flag is added after the length prefix (or at the beginning for a fixed-length array). The array will be tested for holes before encoding and if it doesn't contain holes, a faster path will be taken.
 
-  If you want these types to actually encode holes, you must encode a non-`Array | TypedArray` iterator and pay the performance penalty.
+- For performance, little-endian numeric types (except `int64` and `uint64`) that are passed an actual `Array` or `TypedArray` will not encode holes. The integer types will replace holes with `0` and the float types will replace holes with `NaN`.
 
-- `int64` and `uint64` will encode holes along with the aforementioned performance penalty, since their `TypedArray` constructors will throw when trying to coerce an array with holes.
+  If you want these types to actually encode holes, you must encode a non-`Array | TypedArray` iterator which will incur a performance penalty.
+
+- sparse `int64` and `uint64` arrays will always incur a performance penalty, since their `TypedArray` constructors will throw when trying to coerce an array with holes.
 
   (This actually seems like it might be a bug in the standard. :))
 
@@ -553,10 +556,10 @@ For entertainment purposes only.
 > npm run benchmark
 
 encoding x 10000
-  SchemaPack             342.09 ms
-  crunches (encodeInto)	 154.93 ms
-  crunches (encode)	     250.44 ms
+  SchemaPack	           331.73 ms
+  crunches (encodeInto)	 158.39 ms
+  crunches (encode)	     272.38 ms
 decoding x 10000
-  SchemaPack             221.75 ms
-  crunches               118.27 ms
+  SchemaPack	           223.71 ms
+  crunches	             125.15 ms
 ```

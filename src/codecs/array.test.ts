@@ -88,6 +88,30 @@ for (const numberType of [
     })
     expect(fixedLengthCodec.decode(fixedLengthCodec.encode(value))).to.deep.equal(sparseValue)
   })
+  test(`sparse ${numberType.name} iterable`, () => {
+    const codec = array({
+      element,
+      sparse: true,
+    })
+    const value: number[] = []
+    value[3] = 1
+    value[6] = 1
+    const iterable = {
+      [Symbol.iterator]: function() {
+        const protocol = value.values()
+        return {
+          next: () => {
+            let result = protocol.next();
+            if (result.done) {
+              return {done: true, value: undefined};
+            }
+            return {done: false, value: result.value};
+          },
+        };
+      }
+    }
+    expect(codec.decode(codec.encode(iterable))).to.deep.equal(value)
+  })
 }
 
 for (const numberType of [
@@ -128,6 +152,30 @@ for (const numberType of [
       sparse: true,
     })
     expect(fixedLengthCodec.decode(fixedLengthCodec.encode(value))).to.deep.equal(value)
+  })
+  test(`sparse ${numberType.name} iterable`, () => {
+    const codec = array({
+      element,
+      sparse: true,
+    })
+    const value: bigint[] = []
+    value[3] = 1n
+    value[6] = 1n
+    const iterable = {
+      [Symbol.iterator]: function() {
+        const protocol = value.values()
+        return {
+          next: () => {
+            let result = protocol.next();
+            if (result.done) {
+              return {done: true, value: undefined};
+            }
+            return {done: false, value: result.value};
+          },
+        };
+      }
+    }
+    expect(codec.decode(codec.encode(iterable))).to.deep.equal(value)
   })
 }
 
@@ -243,6 +291,22 @@ for (const numberType of [
     const value = {offset: 0, array: [0, 1, 2]}
     expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(value.array)
   })
+  test(`aligned ${numberType.name} typed array`, () => {
+    const codec = object({
+      offset: int8(),
+      array: array({element}),
+    })
+    const value = {offset: 0, array: new element.elementClass([0, 1, 2])}
+    expect(codec.decode(codec.encode(value)).array).to.deep.equal(value.array)
+  })
+  test(`aligned ${numberType.name} iterable`, () => {
+    const codec = object({
+      offset: int8(),
+      array: array({element, length: 3}),
+    })
+    const value = {offset: 0, array: new Set([0, 1, 2])}
+    expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(Array.from(value.array))
+  })
   test(`aligned fixed-length ${numberType.name} array`, () => {
     const codec = object({
       offset: int8(),
@@ -250,6 +314,22 @@ for (const numberType of [
     })
     const value = {offset: 0, array: [0, 1, 2]}
     expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(value.array)
+  })
+  test(`aligned fixed-length ${numberType.name} typed array`, () => {
+    const codec = object({
+      offset: int8(),
+      array: array({element, length: 3}),
+    })
+    const value = {offset: 0, array: new element.elementClass([0, 1, 2])}
+    expect(codec.decode(codec.encode(value)).array).to.deep.equal(value.array)
+  })
+  test(`aligned fixed-length ${numberType.name} iterable`, () => {
+    const codec = object({
+      offset: int8(),
+      array: array({element, length: 3}),
+    })
+    const value = {offset: 0, array: new Set([0, 1, 2])}
+    expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(Array.from(value.array))
   })
 }
 
@@ -266,6 +346,22 @@ for (const numberType of [
     const value = {offset: 0, array: [0n, 1n, 2n]}
     expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(value.array)
   })
+  test(`aligned ${numberType.name} typed array`, () => {
+    const codec = object({
+      offset: int8(),
+      array: array({element}),
+    })
+    const value = {offset: 0, array: new element.elementClass([0n, 1n, 2n])}
+    expect(codec.decode(codec.encode(value)).array).to.deep.equal(value.array)
+  })
+  test(`aligned ${numberType.name} iterable`, () => {
+    const codec = object({
+      offset: int8(),
+      array: array({element, length: 3}),
+    })
+    const value = {offset: 0, array: new Set([0n, 1n, 2n])}
+    expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(Array.from(value.array))
+  })
   test(`aligned fixed-length ${numberType.name} array`, () => {
     const codec = object({
       offset: int8(),
@@ -273,6 +369,22 @@ for (const numberType of [
     })
     const value = {offset: 0, array: [0n, 1n, 2n]}
     expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(value.array)
+  })
+  test(`aligned fixed-length ${numberType.name} typed array`, () => {
+    const codec = object({
+      offset: int8(),
+      array: array({element, length: 3}),
+    })
+    const value = {offset: 0, array: new element.elementClass([0n, 1n, 2n])}
+    expect(codec.decode(codec.encode(value)).array).to.deep.equal(value.array)
+  })
+  test(`aligned fixed-length ${numberType.name} iterable`, () => {
+    const codec = object({
+      offset: int8(),
+      array: array({element, length: 3}),
+    })
+    const value = {offset: 0, array: new Set([0n, 1n, 2n])}
+    expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(Array.from(value.array))
   })
 }
 

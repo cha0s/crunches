@@ -94,7 +94,7 @@ describe('documentation', () => {
       element: string(),
       sparse: true,
     })
-    expect(schema.size(['foo', , 'bar'])).to.equal(23)
+    expect(schema.size(['foo', , 'bar'])).to.equal(24)
   })
 
   test('map', () => {
