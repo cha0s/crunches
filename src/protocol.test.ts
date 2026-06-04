@@ -1,9 +1,11 @@
 import { expect, test } from 'vitest'
 
-import { Protocol } from './protocol.ts'
-import { object } from './codecs/object.ts'
-import { uint8 } from './codecs/uint8.ts'
-import { string } from './codecs/string.ts'
+import {
+  object,
+  Protocol,
+  string,
+  uint8,
+} from '#crunches'
 
 const protocol = new Protocol({
   foo: object({

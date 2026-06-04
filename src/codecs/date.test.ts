@@ -1,6 +1,6 @@
 import {expect, test} from 'vitest'
 
-import { date } from './date.ts'
+import { date } from '#crunches'
 
 test('date', () => {
   const codec = date()

@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { string } from './string.ts'
+import { string } from '#crunches'
 
 test('string', () => {
   const codec = string()

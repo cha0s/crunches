@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { int64 } from './int64.ts'
+import { int64 } from '#crunches'
 
 test('int64', () => {
   const codec = int64()

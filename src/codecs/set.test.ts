@@ -1,7 +1,9 @@
 import { expect, test } from 'vitest'
 
-import { set } from './set.ts'
-import { uint8 } from './uint8.ts'
+import {
+  set,
+  uint8,
+} from '#crunches'
 
 test('set', () => {
   const codec = set({ element: uint8() })

@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { int32 } from './int32.ts'
+import { int32 } from '#crunches'
 
 test('int32', () => {
   const codec = int32()

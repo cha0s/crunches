@@ -1,9 +1,11 @@
 import {expect, test} from 'vitest'
 
-import { buffer } from './buffer.ts'
-import { map } from './map.ts'
-import { uint8 } from './uint8.ts'
-import { string } from './string.ts'
+import {
+  buffer,
+  map,
+  string,
+  uint8,
+} from '#crunches'
 
 test('buffer', () => {
   const mapSchema = map({

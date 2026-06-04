@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { uint16 } from './uint16.ts'
+import { uint16 } from '#crunches'
 
 test('uint16', () => {
   const codec = uint16()

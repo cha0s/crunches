@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { varint } from './varint.ts'
+import { varint } from '#crunches'
 
 const codec = varint()
 

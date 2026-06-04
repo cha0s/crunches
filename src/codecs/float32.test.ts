@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { float32 } from './float32.ts'
+import { float32 } from '#crunches'
 
 test('float32', () => {
   const codec = float32()
@@ -11,5 +11,11 @@ test('float32', () => {
 test('float32 infinity', () => {
   const codec = float32()
   const value = Infinity
+  expect(codec.decode(codec.encode(value))).to.deep.equal(value)
+})
+
+test('float32 NaN', () => {
+  const codec = float32()
+  const value = NaN
   expect(codec.decode(codec.encode(value))).to.deep.equal(value)
 })

@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { boolean } from './boolean.ts'
+import { boolean } from '#crunches'
 
 test('bool', () => {
   const codec = boolean()

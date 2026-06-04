@@ -1,11 +1,12 @@
 import { expect, test } from 'vitest'
 
-import { type CrunchesBase } from '#types'
-
-import { object } from './object.ts'
-import { boolean } from './boolean.ts'
-import { uint8 } from './uint8.ts'
-import { uint32 } from './uint32.ts'
+import {
+  boolean,
+  type CrunchesBase,
+  object,
+  uint8,
+  uint32,
+} from '#crunches'
 
 test('object', () => {
   const codec = object({

@@ -1,18 +1,21 @@
 import { expect, test } from 'vitest'
 
-import { array, CrunchesArray } from './array.ts'
-import { uint8 } from './uint8.ts'
-import { int8 } from './int8.ts'
-import { int16 } from './int16.ts'
-import { uint16 } from './uint16.ts'
-import { int32 } from './int32.ts'
-import { uint32 } from './uint32.ts'
-import { float32 } from './float32.ts'
-import { float64 } from './float64.ts'
-import { object } from './object.ts'
-import { string } from './string.ts'
-import { int64 } from './int64.ts'
-import { uint64 } from './uint64.ts'
+import {
+  array,
+  CrunchesArray,
+  float32,
+  float64,
+  int8,
+  int16,
+  int32,
+  int64,
+  object,
+  string,
+  uint8,
+  uint16,
+  uint32,
+  uint64,
+} from '#crunches'
 
 for (const numberType of [
   int8,

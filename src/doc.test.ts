@@ -1,19 +1,23 @@
 import { describe, expect, test } from 'vitest'
 
-import { CrunchesType, type Target } from '#types'
-
-import { array } from './codecs/array.ts'
-import { boolean } from './codecs/boolean.ts'
-import { float32 } from './codecs/float32.ts'
-import { int32 } from './codecs/int32.ts'
-import { map } from './codecs/map.ts'
-import { object } from './codecs/object.ts'
-import { set } from './codecs/set.ts'
-import { CrunchesString, string } from './codecs/string.ts'
-import { uint8 } from './codecs/uint8.ts'
-import { uint32 } from './codecs/uint32.ts'
-import { varuint } from './codecs/varuint.ts'
-import { Protocol, type ProtocolInfer } from './protocol.ts'
+import {
+  array,
+  boolean,
+  CrunchesString,
+  CrunchesType,
+  float32,
+  int32,
+  map,
+  object,
+  type ProtocolInfer,
+  Protocol,
+  set,
+  string,
+  type Target,
+  uint8,
+  uint32,
+  varuint,
+} from '#crunches'
 
 describe('documentation', () => {
 
