@@ -74,11 +74,6 @@ export class CrunchesArray<E extends CrunchesType<any>>
       else {
         this.$$sizeOf = (value, byteOffset) => {
           let size = 0
-          // let the environment report
-          /* v8 ignore next 3 */
-          if (!value[Symbol.iterator]) {
-            for (const _ of value) {/* ... */} // eslint-disable-line no-unused-vars
-          }
           let protocol = value[Symbol.iterator]()
           let result = protocol.next()
           for (let i = 0; i < length; ++i) {
@@ -161,10 +156,6 @@ export class CrunchesArray<E extends CrunchesType<any>>
         || false === this.$$elementCodec.isLittleEndian
         || (!Array.isArray(value) && !ArrayBuffer.isView(value))
       ) {
-        // let the environment report
-        if (!value[Symbol.iterator]) {
-          for (const _ of value) {/* ... */} // eslint-disable-line no-unused-vars
-        }
         let protocol = value[Symbol.iterator]()
         let result = protocol.next()
         for (let i = 0; i < this.$$length; ++i) {
