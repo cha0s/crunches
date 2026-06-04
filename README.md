@@ -224,6 +224,36 @@ expect(schema.size(value)).to.equal(25)
 expect(schema.size([[32, 'sup'], [64, 'hi']])).to.equal(25)
 ```
 
+#### Sparse maps
+
+Maps may be encoded as sparse through the `sparse` key.
+
+```ts
+const schema = map({
+  key: uint8(),
+  value: string(),
+  sparse: true,
+})
+```
+
+As the name implies, this allows sparse maps such as:
+
+```ts
+// 27 =
+//   array prefix    (4) +
+//   uint8 key       (1) +
+//   uint8 key       (1) +
+//   uint8 key       (1) +
+//   sparse flag     (1) +
+//   presence length (4) +
+//   3 presence bits (1) +
+//   string length   (4) +
+//   'one'           (3) +
+//   string length   (4) +
+//   'bar'           (3)
+const entries = [[1, 'one'], [2, undefined], [3, 'bar']] as Iterable<[number, string]>
+expect(schema.size(entries)).to.equal(27)
+
 ### `set`
 
 Requires an `element` key to define the structure of the map. Any [iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) will be coerced. Encoded as an array. Decodes to a native `Set` object.

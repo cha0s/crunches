@@ -1,11 +1,13 @@
 import { CrunchesType, type Target } from '#types'
 
-import { CrunchesArray } from './array.ts'
-import { CrunchesObject } from './object.ts'
+import { CrunchesArray, type CrunchesArrayInput } from './array.ts'
+
+type ExtractIterable<T> = T extends Iterable<infer V, any, any> ? V : never;
 
 export class CrunchesMap <
   K extends CrunchesType<unknown, unknown>,
-  V extends CrunchesType<unknown, unknown>
+  V extends CrunchesType<unknown, unknown>,
+  IsSparse extends boolean = false
 >
   extends CrunchesType<
     Map<K['_output'], V['_output']>,
@@ -13,26 +15,32 @@ export class CrunchesMap <
   >
 {
 
-  protected $$array: CrunchesArray<CrunchesObject<{ key: K; value: V }>>
+  $$keyCodec: CrunchesArray<K, IsSparse>
+  $$valueCodec: CrunchesArray<V, IsSparse>
 
-  constructor({ key, value }: { key: K; value: V; }) {
+  constructor({ key, value, sparse = false as IsSparse }: { key: K; value: V; sparse?: IsSparse }) {
     super()
-    this.$$array = new CrunchesArray({
-      element: new CrunchesObject({ key, value }),
-    })
+    this.$$keyCodec = new CrunchesArray({ element: key })
+    this.$$valueCodec = new CrunchesArray({ element: value, sparse })
   }
 
   bigEndian(): this {
-    if (undefined === this.$$array.isLittleEndian) {
-      this.$$array.bigEndian()
+    if (undefined === this.$$keyCodec.isLittleEndian) {
+      this.$$keyCodec.bigEndian()
+    }
+    if (undefined === this.$$valueCodec.isLittleEndian) {
+      this.$$valueCodec.bigEndian()
     }
     return super.bigEndian()
   }
 
   decodeFrom(view: DataView, target: Target): Map<K['_output'], V['_output']> {
     const result = new Map<K['_output'], V['_output']>()
-    for (const { key, value } of this.$$array.decodeFrom(view, target) as Array<{ key: K['_output']; value: V['_output'] }>) {
-      result.set(key, value)
+    const keys = this.$$keyCodec.decodeFrom(view, target)
+    this.$$valueCodec.length = keys.length
+    const values = this.$$valueCodec.decodeFrom(view, target)
+    for (let i = 0; i < keys.length; ++i) {
+      result.set(keys[i], values[i])
     }
     return result
   }
@@ -42,16 +50,25 @@ export class CrunchesMap <
     view: DataView,
     byteOffset: number,
   ): number {
-    const entries: Array<{ key: K['_input']; value: V['_input'] }> = []
-    for (const [k, v] of value as Iterable<[K['_input'], V['_input']]>) {
-      entries.push({ key: k, value: v })
+    const keys: ExtractIterable<CrunchesArrayInput<K, IsSparse>>[] = []
+    const values: ExtractIterable<CrunchesArrayInput<V, IsSparse>>[] = []
+    for (const [k, v] of value as Iterable<[typeof keys[number], typeof values[number]]>) {
+      keys.push(k)
+      values.push(v)
     }
-    return this.$$array.encodeInto(entries as any, view, byteOffset)
+    let written = 0
+    written += this.$$keyCodec.encodeInto(keys, view, written + byteOffset)
+    this.$$valueCodec.length = keys.length
+    written += this.$$valueCodec.encodeInto(values, view, written + byteOffset)
+    return written
   }
 
   littleEndian(): this {
-    if (undefined === this.$$array.isLittleEndian) {
-      this.$$array.littleEndian()
+    if (undefined === this.$$keyCodec.isLittleEndian) {
+      this.$$keyCodec.littleEndian()
+    }
+    if (undefined === this.$$valueCodec.isLittleEndian) {
+      this.$$valueCodec.littleEndian()
     }
     return super.littleEndian()
   }
@@ -60,18 +77,25 @@ export class CrunchesMap <
     value: Map<K['_input'], V['_input']> | Iterable<[K['_input'], V['_input']]>,
     byteOffset: number
   ): number {
-    const entries: Array<{ key: K['_input']; value: V['_input'] }> = []
-    for (const [k, v] of value as Iterable<[K['_input'], V['_input']]>) {
-      entries.push({ key: k, value: v })
+    const keys: ExtractIterable<CrunchesArrayInput<K, IsSparse>>[] = []
+    const values: ExtractIterable<CrunchesArrayInput<V, IsSparse>>[] = []
+    for (const [k, v] of value as Iterable<[typeof keys[number], typeof values[number]]>) {
+      keys.push(k)
+      values.push(v)
     }
-    return this.$$array.sizeOf(entries as any, byteOffset)
+    let size = 0
+    size += this.$$keyCodec.sizeOf(keys, size + byteOffset)
+    this.$$valueCodec.length = keys.length
+    size += this.$$valueCodec.sizeOf(values, size + byteOffset)
+    return size
   }
 
 }
 
 export function map<
   K extends CrunchesType<unknown, unknown>,
-  V extends CrunchesType<unknown, unknown>
->(options: { key: K; value: V }) {
+  V extends CrunchesType<unknown, unknown>,
+  IsSparse extends boolean = false
+>(options: { key: K; value: V, sparse?: IsSparse }) {
   return new CrunchesMap(options)
 }

@@ -89,7 +89,7 @@ describe('documentation', () => {
     expect(array({element: uint32(), length: 3}).size([1, 2, 3])).to.equal(12)
   })
 
-  test('sparse', () => {
+  test('sparse array', () => {
     const schema = array({
       element: string(),
       sparse: true,
@@ -109,6 +109,16 @@ describe('documentation', () => {
     expect(schema.size(value)).to.equal(25)
     // same, with coercion
     expect(schema.size([[32, 'sup'], [64, 'hi']])).to.equal(25)
+  })
+
+  test('sparse map', () => {
+    const schema = map({
+      key: uint8(),
+      value: string(),
+      sparse: true,
+    })
+    const entries = [[1, 'one'], [2, undefined], [3, 'bar']] as Iterable<[number, string]>
+    expect(schema.size(entries)).to.equal(27)
   })
 
   test('set', () => {
