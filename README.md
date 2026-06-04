@@ -111,9 +111,15 @@ const schema = object({
   foo: uint32(),
   bar: string().optional(),
 })
-// 14 = uint32 (4) + optional flag (1) + string prefix (4) + 'hello' (5)
+// 14 =
+//   uint32        (4) +
+//   optional flag (1) +
+//   string prefix (4) +
+//   'hello'       (5)
 expect(schema.size({foo: 32, bar: 'hello'})).to.equal(14)
-// 5 = uint32 (4) + optional flag (1)
+// 5 =
+//   uint32        (4) +
+//   optional flag (1)
 expect(schema.size({foo: 32})).to.equal(5)
 ```
 
@@ -125,7 +131,11 @@ Requires an `element` key to define the structure of the array elements. Encodes
 const schema = array({
   element: uint32(),
 })
-// 16 = array prefix (4) + uint32 (4) + uint32 (4) + uint32 (4)
+// 16 =
+//   array prefix (4) +
+//   uint32       (4) +
+//   uint32       (4) +
+//   uint32       (4)
 expect(schema.size([1, 2, 3])).to.equal(16)
 ```
 
@@ -133,18 +143,58 @@ Arrays of number types decode to [the corresponding `TypedArray`](#buffers-and-a
 
 #### Fixed-length arrays
 
-Arrays may be specified as fixed-length through the `length` key.
+Arrays may be encoded as fixed-length through the `length` key.
 
 ```ts
 const schema = array({
   element: uint32(),
   length: 3,
 })
-// 12 = uint32 (4) + uint32 (4) + uint32 (4)
+// 12 =
+//   uint32 (4) +
+//   uint32 (4) +
+//   uint32 (4)
 expect(schema.size([1, 2, 3])).to.equal(12)
 ```
 
 No prefix is written, saving 4 bytes!
+
+#### Sparse arrays
+
+Arrays may be encoded as sparse through the `sparse` key.
+
+```ts
+const schema = array({
+  element: string(),
+  sparse: true,
+})
+```
+
+As the name implies, this allows sparse arrays such as:
+
+```ts
+// 23 =
+//   array prefix    (4) +
+//   presence length (4) +
+//   3 presence bits (1) +
+//   string length   (4) +
+//   'foo'           (3) +
+//   string length   (4) +
+//   'bar'           (3)
+expect(schema.size(['foo', , 'bar'])).to.equal(23)
+```
+
+A coalesced bitmap is encoded after the 32-bit prefix and before the values, similarly to how [booleans are coalesced](#boolean-coalescence). That's why the example above only uses 1 byte to encode the presence of 3 elements.
+
+A couple notes about sparse arrays:
+
+- For performance, little-endian numeric types (except `int64` and `uint64`) that are passed an actual `Array` or `TypedArray` will never encode holes. The integer types will replace holes with `0` and the float types will replace holes with `NaN`.
+
+  If you want these types to actually encode holes, you must encode a non-`Array | TypedArray` iterator and pay the performance penalty.
+
+- `int64` and `uint64` will encode holes along with the aforementioned performance penalty, since their `TypedArray` constructors will throw when trying to coerce an array with holes.
+
+  (This actually seems like it might be a bug in the standard. :))
 
 ### `map`
 
@@ -158,7 +208,14 @@ const schema = map({
 const value = new Map<number, string>()
 value.set(32, 'sup')
 value.set(64, 'hi')
-// 25 = array prefix (4) + int32 (4) + string prefix (4) + 'sup' (3) + int32 (4) + string prefix (4) + 'hi' (2)
+// 25 =
+//   array prefix  (4) +
+//   int32         (4) +
+//   string prefix (4) +
+//   'sup'         (3) +
+//   int32         (4) +
+//   string prefix (4) +
+//   'hi'          (2)
 expect(schema.size(value)).to.equal(25)
 // same, with coercion
 expect(schema.size([[32, 'sup'], [64, 'hi']])).to.equal(25)
@@ -175,7 +232,12 @@ const schema = set({
 const value = new Set<string>()
 value.add('foo')
 value.add('bar')
-// 18 = array prefix (4) + string prefix (4) + 'foo' (3) + string prefix (4) + 'bar' (3)
+// 18 =
+//   array prefix  (4) +
+//   string prefix (4) +
+//   'foo'         (3) +
+//   string prefix (4) +
+//   'bar'         (3)
 expect(schema.size(value)).to.equal(18)
 // same, with coercion
 expect(schema.size(['foo', 'bar'])).to.equal(18)
@@ -387,7 +449,7 @@ Arrays always use a 32-bit prefix and may not specify a `varuint` prefix. This i
 
 A massive performance gain is achieved by copy-free buffer decoding. In other words, a buffer value is not copied out of the binary from which it is decoded; a `DataView` is created over the encoded binary and the `DataView` is returned. Decoding a 1024-byte buffer is ***10x faster*** on the machine used to benchmark. The gains increase even more as the size of the buffer increases.
 
-A similar performance gain is also used for arrays. The fast path is used for arrays of the following types:
+A similar performance gain is also used for little-endian arrays. The fast path is used for arrays of the following types:
 
 - `int8` (`Int8Array`)
 - `uint8` (`Uint8Array`)
@@ -413,8 +475,10 @@ Instead of copying the data from the buffer, a [`TypedArray`](https://developer.
 
 For entertainment purposes only.
 
+(smaller is better)
+
 ```
-> npx tsx benchmark/run.ts
+> npm run benchmark
 
 encoding x 10000
   SchemaPack             342.09 ms

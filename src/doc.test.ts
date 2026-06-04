@@ -84,6 +84,13 @@ describe('documentation', () => {
     expect(array({element: uint32(), length: 3}).size([1, 2, 3])).to.equal(12)
   })
 
+  test('sparse', () => {
+    const schema = array({
+      element: string(),
+      sparse: true,
+    })
+    expect(schema.size(['foo', , 'bar'])).to.equal(23)
+  })
 
   test('map', () => {
     const schema = map({
@@ -137,6 +144,14 @@ describe('documentation', () => {
     expect(schema.size('hello')).to.equal(6)
   })
 
+  test('endianness', () => {
+    object({
+      health: varuint(), // by default, properties inherit the endianness of their parent
+      strength: varuint(), // so, these properties are big endian
+      accumulator: uint32().littleEndian(), // but children may override their endianness
+    }).bigEndian(); // the object is big endian
+  })
+
   test('extensibile', () => {
     class MySuperCustomDate extends CrunchesType<Date, Date | string | number> {
       private readonly $$string: CrunchesString
@@ -180,6 +195,14 @@ describe('documentation', () => {
       name: 'John Doe',
       when: new Date('2009-02-13T23:31:30.123Z')
     })
+  })
+
+  test('prefixes', () => {
+    const schema = string({
+      varuint: true,
+    })
+    // 6 = varuint prefix (1) + 'hello' (5)
+    expect(schema.size('hello')).to.equal(6)
   })
 
 })

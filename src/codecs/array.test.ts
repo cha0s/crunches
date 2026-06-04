@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { array } from './array.ts'
+import { array, CrunchesArray } from './array.ts'
 import { uint8 } from './uint8.ts'
 import { int8 } from './int8.ts'
 import { int16 } from './int16.ts'
@@ -28,19 +28,62 @@ for (const numberType of [
   const codec = array({
     element,
   })
-  const testNumberArray = (value: Iterable<number>) => {
+  const fixedLengthCodec = array({
+    element,
+    length: 4,
+  })
+  const numbers = [1, 2, 3, 4]
+  const testNumberArray = (codec: CrunchesArray<any>, value: Iterable<number>) => {
     expect(codec.decode(codec.encode(value))).to.deep.equal(
       new element.elementClass(value),
     )
   }
   test(`${numberType.name} typed array`, () => {
-    testNumberArray(new element.elementClass([1, 2, 3, 4]))
+    testNumberArray(codec, new element.elementClass(numbers))
   })
   test(`${numberType.name} array`, () => {
-    testNumberArray([1, 2, 3, 4])
+    testNumberArray(codec, numbers)
   })
   test(`${numberType.name} iterable`, () => {
-    testNumberArray(new Set([1, 2, 3, 4]))
+    testNumberArray(codec, new Set(numbers))
+  })
+  test(`${numberType.name} fixed-length typed array`, () => {
+    testNumberArray(fixedLengthCodec, new element.elementClass(numbers))
+  })
+  test(`${numberType.name} fixed-length array`, () => {
+    testNumberArray(fixedLengthCodec, numbers)
+  })
+  test(`${numberType.name} fixed-length iterable`, () => {
+    testNumberArray(fixedLengthCodec, new Set(numbers))
+  })
+  test(`sparse ${numberType.name} array`, () => {
+    const codec = array({
+      element,
+      sparse: true,
+    })
+    const value = [1, 2, , 4]
+    const sparseValue = new element.elementClass([
+      1,
+      2,
+      (numberType === float32) || (numberType === float64) ? NaN : 0,
+      4,
+    ])
+    expect(codec.decode(codec.encode(value))).to.deep.equal(sparseValue)
+  })
+  test(`sparse ${numberType.name} fixed-length array`, () => {
+    const value = [1, 2, , 4]
+    const sparseValue = new element.elementClass([
+      1,
+      2,
+      (numberType === float32) || (numberType === float64) ? NaN : 0,
+      4,
+    ])
+    const fixedLengthCodec = array({
+      element,
+      length: 4,
+      sparse: true,
+    })
+    expect(fixedLengthCodec.decode(fixedLengthCodec.encode(value))).to.deep.equal(sparseValue)
   })
 }
 
@@ -66,6 +109,23 @@ for (const numberType of [
   test(`${numberType.name} iterable`, () => {
     testNumberArray(new Set([1n, 2n, 3n, 4n]))
   })
+  test(`sparse ${numberType.name} array`, () => {
+    const codec = array({
+      element,
+      sparse: true,
+    })
+    const value = [1n, 2n, , 4n]
+    expect(codec.decode(codec.encode(value))).to.deep.equal(value)
+  })
+  test(`sparse ${numberType.name} fixed-length array`, () => {
+    const value = [1n, 2n, , 4n]
+    const fixedLengthCodec = array({
+      element,
+      length: 4,
+      sparse: true,
+    })
+    expect(fixedLengthCodec.decode(fixedLengthCodec.encode(value))).to.deep.equal(value)
+  })
 }
 
 test('string array', () => {
@@ -76,24 +136,6 @@ test('string array', () => {
   expect(codec.decode(codec.encode(value))).to.deep.equal(value)
 })
 
-test('fixed-length integer array', () => {
-  const codec = array({
-    element: uint8(),
-    length: 4,
-  })
-  const value = [1, 2, 3, 4]
-  expect(Array.from(codec.decode(codec.encode(value)))).to.deep.equal(value)
-})
-
-test('fixed-length float array', () => {
-  const codec = array({
-    element: float64(),
-    length: 4,
-  })
-  const value = [1, 2, 3, 4]
-  expect(Array.from(codec.decode(codec.encode(value)))).to.deep.equal(value)
-})
-
 test('fixed-length string array', () => {
   const codec = array({
     element: string(),
@@ -101,6 +143,61 @@ test('fixed-length string array', () => {
   })
   const value = ['one', 'two', 'three', 'four']
   expect(Array.from(codec.decode(codec.encode(value)))).to.deep.equal(value)
+})
+
+test('string iterable', () => {
+  const codec = array({
+    element: string(),
+  })
+  const value = ['one', 'two', 'three', 'four']
+  expect(codec.decode(codec.encode(new Set(value)))).to.deep.equal(value)
+})
+
+test('fixed-length string iterable', () => {
+  const codec = array({
+    element: string(),
+    length: 4,
+  })
+  const value = ['one', 'two', 'three', 'four']
+  expect(Array.from(codec.decode(codec.encode(new Set(value))))).to.deep.equal(value)
+})
+
+test('sparse string array', () => {
+  const codec = array({
+    element: string(),
+    sparse: true,
+  })
+  const value = ['one', 'two', , 'four']
+  expect(codec.decode(codec.encode(value))).to.deep.equal(value)
+})
+
+test('sparse fixed-length string array', () => {
+  const codec = array({
+    element: string(),
+    length: 4,
+    sparse: true,
+  })
+  const value = ['one', 'two', , 'four']
+  expect(Array.from(codec.decode(codec.encode(value)))).to.deep.equal(value)
+})
+
+test('sparse string iterable', () => {
+  const codec = array({
+    element: string(),
+    sparse: true,
+  })
+  const value = ['one', 'two', , 'four']
+  expect(codec.decode(codec.encode(new Set(value)))).to.deep.equal(value)
+})
+
+test('sparse fixed-length string iterable', () => {
+  const codec = array({
+    element: string(),
+    length: 4,
+    sparse: true,
+  })
+  const value = ['one', 'two', , 'four']
+  expect(Array.from(codec.decode(codec.encode(new Set(value))))).to.deep.equal(value)
 })
 
 test('fixed-length string drop', () => {
@@ -149,6 +246,29 @@ for (const numberType of [
       array: array({element, length: 3}),
     })
     const value = {offset: 0, array: [0, 1, 2]}
+    expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(value.array)
+  })
+}
+
+for (const numberType of [
+  int64,
+  uint64,
+]) {
+  const element = numberType()
+  test(`aligned ${numberType.name} array`, () => {
+    const codec = object({
+      offset: int8(),
+      array: array({element}),
+    })
+    const value = {offset: 0, array: [0n, 1n, 2n]}
+    expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(value.array)
+  })
+  test(`aligned fixed-length ${numberType.name} array`, () => {
+    const codec = object({
+      offset: int8(),
+      array: array({element, length: 3}),
+    })
+    const value = {offset: 0, array: [0n, 1n, 2n]}
     expect(Array.from(codec.decode(codec.encode(value)).array)).to.deep.equal(value.array)
   })
 }
