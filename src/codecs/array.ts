@@ -20,21 +20,14 @@ function isNumeric(codec: CrunchesType<unknown, unknown>): codec is CrunchesNume
   return codec instanceof CrunchesNumeric
 }
 
-type ArrayDecodeFunc<E extends CrunchesType<unknown, unknown>> =
-  (view: DataView, target: Target) => CrunchesArrayOutput<E>
-
-type ArrayEncodeFunc<E extends CrunchesType<unknown, unknown>> =
-  (value: CrunchesArrayInput<E>, view: DataView, byteOffset: number) => number
-
 export class CrunchesArray<E extends CrunchesType<any>>
   extends CrunchesType<CrunchesArrayOutput<E>, CrunchesArrayInput<E>>
 {
 
-  $$decodeFrom!: ArrayDecodeFunc<E>
   $$elementByteWidth: number
   $$elementCodec: CrunchesType<unknown>
   $$elementClass: TypedArrayConstructor | undefined
-  $$encodeInto!: ArrayEncodeFunc<E>
+  $$length: number
   $$sizeOf!: (value: CrunchesArrayInput<E>, byteOffset: number) => number
 
   constructor({ element, length = 0 }: { element: E; length?: number }) {
@@ -42,46 +35,10 @@ export class CrunchesArray<E extends CrunchesType<any>>
     this.$$elementCodec = element
     this.$$elementByteWidth = isNumeric(element) ? element.byteWidth : 0
     this.$$elementClass = isNumeric(element) ? element.elementClass : undefined
+    this.$$length = length
     const elementClass = this.$$elementClass
-    let decoderCode = '', encoderCode = ''
     // varlen
     if (0 === length) {
-      decoderCode += `
-        const length = view.getUint32(target.byteOffset, this.isLittleEndian ?? true)
-        target.byteOffset += 4
-        target.byteOffset += this.$$elementCodec.padding(target.byteOffset)
-      `
-      encoderCode += `
-        let length = 0
-        let written = 4 + this.$$elementCodec.padding(byteOffset + 4)
-      `
-      if (elementClass) {
-        encoderCode += `
-          if ((false !== this.$$elementCodec.isLittleEndian) && (Array.isArray(value) || ArrayBuffer.isView(value))) {
-            length = value.length
-            new this.$$elementClass(
-              view.buffer,
-              view.byteOffset + byteOffset + written,
-              length,
-            ).set(Array.isArray(value) ? new this.$$elementClass(value) : value)
-            written += this.$$elementClass.BYTES_PER_ELEMENT * length
-          }
-          else {
-        `
-      }
-      encoderCode += `
-        for (const element of value) {
-          length += 1
-          written += this.$$elementCodec.encodeInto(element, view, byteOffset + written)
-        }
-      `
-      if (elementClass) {
-        encoderCode += '}'
-      }
-      encoderCode += `
-        view.setUint32(byteOffset, length, this.isLittleEndian ?? true)
-        return written
-      `
       if (elementClass) {
         this.$$sizeOf = (value, byteOffset) => {
           let size = 4 + this.$$elementCodec.padding(byteOffset + 4)
@@ -109,38 +66,6 @@ export class CrunchesArray<E extends CrunchesType<any>>
     }
     // fixed
     else {
-      decoderCode += `const length = ${length};`
-      encoderCode += `let written = 0`
-      if (elementClass) {
-        encoderCode += `
-          if ((false !== this.$$elementCodec.isLittleEndian) && (Array.isArray(value) || ArrayBuffer.isView(value))) {
-            written += this.$$elementCodec.padding(byteOffset)
-            new this.$$elementClass(
-              view.buffer,
-              view.byteOffset + byteOffset + written,
-              ${length},
-            ).set(Array.isArray(value) ? new this.$$elementClass(value) : value)
-            written += this.$$elementClass.BYTES_PER_ELEMENT * ${length}
-          }
-          else {
-        `
-      }
-      encoderCode += `
-        // let the environment report
-        if (!value[Symbol.iterator]) {
-          for (const _ of value) {/* ... */} // eslint-disable-line no-unused-vars
-        }
-        let protocol = value[Symbol.iterator]()
-        let result = protocol.next()
-        for (let i = 0; i < ${length}; ++i) {
-          written += this.$$elementCodec.encodeInto(result.value, view, byteOffset + written)
-          result = protocol.next()
-        }
-      `
-      if (elementClass) {
-        encoderCode += '}'
-      }
-      encoderCode += 'return written;'
       if (elementClass) {
         this.$$sizeOf = (_value, byteOffset) => {
           return this.$$elementCodec.padding(byteOffset) + length * elementClass.BYTES_PER_ELEMENT
@@ -164,26 +89,6 @@ export class CrunchesArray<E extends CrunchesType<any>>
         }
       }
     }
-    // static shape
-    if (elementClass) {
-      decoderCode += `
-        target.byteOffset += this.$$elementCodec.padding(target.byteOffset)
-        const value = new this.$$elementClass(view.buffer, view.byteOffset + target.byteOffset, length)
-        target.byteOffset += ${elementClass.BYTES_PER_ELEMENT} * length
-      `
-    }
-    // dynamic shape
-    else {
-      decoderCode += `
-        const value = Array(length)
-        for (let i = 0; i < length; ++i) {
-          value[i] = this.$$elementCodec.decodeFrom(view, target)
-        }
-      `
-    }
-    decoderCode += 'return value;'
-    this.$$decodeFrom = new Function('view, target', decoderCode) as ArrayDecodeFunc<E>
-    this.$$encodeInto = new Function('value, view, byteOffset', encoderCode) as ArrayEncodeFunc<E>
   }
 
   bigEndian(): this {
@@ -194,11 +99,91 @@ export class CrunchesArray<E extends CrunchesType<any>>
   }
 
   decodeFrom(view: DataView, target: Target) {
-    return this.$$decodeFrom(view, target)
+    let length: number
+    if (0 === this.$$length) {
+      length = view.getUint32(target.byteOffset, this.isLittleEndian ?? true)
+      target.byteOffset += 4
+      target.byteOffset += this.$$elementCodec.padding(target.byteOffset)
+    }
+    else {
+      length = this.$$length;
+    }
+    // static shape
+    if (this.$$elementClass) {
+      target.byteOffset += this.$$elementCodec.padding(target.byteOffset)
+      const value = new this.$$elementClass(view.buffer as ArrayBuffer, view.byteOffset + target.byteOffset, length)
+      target.byteOffset += this.$$elementClass.BYTES_PER_ELEMENT * length
+      return value as CrunchesArrayOutput<E>
+    }
+    // dynamic shape
+    else {
+      const value: Array<E['_output']> = Array(length)
+      for (let i = 0; i < length; ++i) {
+        value[i] = this.$$elementCodec.decodeFrom(view, target)
+      }
+      return value as CrunchesArrayOutput<E>
+    }
   }
 
   encodeInto(value: CrunchesArrayInput<E>, view: DataView, byteOffset: number) {
-    return this.$$encodeInto(value, view, byteOffset)
+    if (0 === this.$$length) {
+      let length = 0
+      let written = 4 + this.$$elementCodec.padding(byteOffset + 4)
+      // slow path (dynamic shape, big endian, iterator)
+      if (
+        !this.$$elementClass
+        || false === this.$$elementCodec.isLittleEndian
+        || (!Array.isArray(value) && !ArrayBuffer.isView(value))
+      ) {
+        for (const element of value) {
+          length += 1
+          written += this.$$elementCodec.encodeInto(element, view, byteOffset + written)
+        }
+      }
+      // fast path (TypedArray)
+      else {
+        length = (value as E['_input']).length
+        new this.$$elementClass(
+          view.buffer as ArrayBuffer,
+          view.byteOffset + byteOffset + written,
+          length,
+        ).set(Array.isArray(value) ? new this.$$elementClass(value) : value as any)
+        written += this.$$elementClass.BYTES_PER_ELEMENT * length
+      }
+      view.setUint32(byteOffset, length, this.isLittleEndian ?? true)
+      return written
+    }
+    else {
+      let written = 0
+      // slow path (dynamic shape, big endian, iterator)
+      if (
+        !this.$$elementClass
+        || false === this.$$elementCodec.isLittleEndian
+        || (!Array.isArray(value) && !ArrayBuffer.isView(value))
+      ) {
+        // let the environment report
+        if (!value[Symbol.iterator]) {
+          for (const _ of value) {/* ... */} // eslint-disable-line no-unused-vars
+        }
+        let protocol = value[Symbol.iterator]()
+        let result = protocol.next()
+        for (let i = 0; i < this.$$length; ++i) {
+          written += this.$$elementCodec.encodeInto(result.value, view, byteOffset + written)
+          result = protocol.next()
+        }
+      }
+      // fast path (TypedArray)
+      else {
+        written += this.$$elementCodec.padding(byteOffset)
+        new this.$$elementClass(
+          view.buffer as ArrayBuffer,
+          view.byteOffset + byteOffset + written,
+          this.$$length,
+        ).set(Array.isArray(value) ? new this.$$elementClass(value) : value as any)
+        written += this.$$elementClass.BYTES_PER_ELEMENT * this.$$length
+      }
+      return written;
+    }
   }
 
   littleEndian(): this {
