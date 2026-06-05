@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.1.0](https://github.com/cha0s/crunches/compare/crunches-v3.0.1...crunches-v3.1.0) (2026-06-05)
+
+
+### Features
+
+* protocol ([6825887](https://github.com/cha0s/crunches/commit/6825887d820659e1b561d84dec82b55fb691278a))
+* sparse arrays ([faefea4](https://github.com/cha0s/crunches/commit/faefea4bb372749a071222467cef96074135b4f2))
+* sparse maps ([e6fabe5](https://github.com/cha0s/crunches/commit/e6fabe51d31e2459f78b991271f229c50a06a7b6))
+
+
+### Bug Fixes
+
+* key sanitization ([6864d71](https://github.com/cha0s/crunches/commit/6864d71f1d55075576ec2a17159a7e4c41f0a53d))
+
 ## [3.0.1](https://github.com/cha0s/crunches/compare/crunches-v3.0.0...crunches-v3.0.1) (2026-05-24)
 
 
