@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/cha0s/crunches/compare/crunches-v3.1.0...crunches-v3.1.1) (2026-06-05)
+
+
+### Miscellaneous Chores
+
+* npm stinks ([ba6f86c](https://github.com/cha0s/crunches/commit/ba6f86c3d138aecab3e9de6e145273e1eda636e0))
+
 ## [3.1.0](https://github.com/cha0s/crunches/compare/crunches-v3.0.1...crunches-v3.1.0) (2026-06-05)
 
 
