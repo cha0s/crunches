@@ -11,7 +11,7 @@ import { CrunchesUint8, uint8 } from './uint8'
 type TypedArrayFor<E extends CrunchesNumeric<number | bigint>> =
   InstanceType<E['typedArray']>
 
-type MaybeUndefined<T, IsSparse> = IsSparse extends true
+type ArrayElementMaybeUndefined<T, IsSparse> = IsSparse extends true
   ? T | undefined
   : T
 
@@ -21,7 +21,7 @@ export type CrunchesArrayInput<
   IsSparse
 > =
   Iterable<
-    MaybeUndefined<E extends CrunchesNumeric<infer N> ? N : E['_input'], IsSparse>
+    ArrayElementMaybeUndefined<E extends CrunchesNumeric<infer N> ? N : E['_input'], IsSparse>
   >
 
 // output type: TypedArray for numeric elements, regular array otherwise
@@ -31,7 +31,7 @@ export type CrunchesArrayOutput<
 > =
   E extends CrunchesNumeric<number | bigint>
     ? TypedArrayFor<E>
-    : Array<MaybeUndefined<E['_output'], IsSparse>>
+    : Array<ArrayElementMaybeUndefined<E['_output'], IsSparse>>
 
 export class CrunchesArray<
   E extends CrunchesType<any>,

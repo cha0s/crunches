@@ -4,14 +4,18 @@ import { CrunchesArray, type CrunchesArrayInput } from './array.ts'
 
 type ExtractIterable<T> = T extends Iterable<infer V, any, any> ? V : never;
 
+type MapValueMaybeUndefined<T, IsSparse> = IsSparse extends true
+  ? T | undefined
+  : T
+
 export class CrunchesMap <
   K extends CrunchesType<unknown, unknown>,
   V extends CrunchesType<unknown, unknown>,
   IsSparse extends boolean = false
 >
   extends CrunchesType<
-    Map<K['_output'], V['_output']>,
-    Map<K['_input'], V['_input']> | Iterable<[K['_input'], V['_input']]>
+    Map<K['_output'], MapValueMaybeUndefined<V['_output'], IsSparse>>,
+    Map<K['_input'], MapValueMaybeUndefined<V['_input'], IsSparse>> | Iterable<[K['_input'], MapValueMaybeUndefined<V['_input'], IsSparse>]>
   >
 {
 
@@ -34,7 +38,7 @@ export class CrunchesMap <
     return super.bigEndian()
   }
 
-  decodeFrom(view: DataView, target: Target): Map<K['_output'], V['_output']> {
+  decodeFrom(view: DataView, target: Target): Map<K['_output'], V['_output'] | undefined> {
     const result = new Map<K['_output'], V['_output']>()
     const keys = this.$$keyCodec.decodeFrom(view, target)
     this.$$valueCodec.length = keys.length
@@ -46,7 +50,7 @@ export class CrunchesMap <
   }
 
   encodeInto(
-    value: Map<K['_input'], V['_input']> | Iterable<[K['_input'], V['_input']]>,
+    value: Map<K['_input'], V['_input'] | undefined> | Iterable<[K['_input'], V['_input'] | undefined]>,
     view: DataView,
     byteOffset: number,
   ): number {
@@ -74,7 +78,7 @@ export class CrunchesMap <
   }
 
   sizeOf(
-    value: Map<K['_input'], V['_input']> | Iterable<[K['_input'], V['_input']]>,
+    value: Map<K['_input'], V['_input'] | undefined> | Iterable<[K['_input'], V['_input'] | undefined]>,
     byteOffset: number
   ): number {
     const keys: ExtractIterable<CrunchesArrayInput<K, IsSparse>>[] = []
