@@ -253,6 +253,7 @@ As the name implies, this allows sparse maps such as:
 //   'bar'           (3)
 const entries = [[1, 'one'], [2, undefined], [3, 'bar']] as Iterable<[number, string]>
 expect(schema.size(entries)).to.equal(27)
+```
 
 ### `set`
 
