@@ -55,6 +55,7 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
     let i = 0
     for (const key in props) {
       const property = props[key]
+      const sanitizedKey = JSON.stringify(key)
       const codec = property instanceof CrunchesOptional ? property.inner : property
       if (property instanceof CrunchesOptional) {
         this.$$optionals += 1
@@ -65,7 +66,7 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
           else {
         `
         encoderCode += `
-          isPresent = 'undefined' !== typeof value['${key}']
+          isPresent = 'undefined' !== typeof value[${sanitizedKey}]
           optionalFlags[currentOptional >> 3] |= (isPresent ? 1 : 0) << (currentOptional & 7)
           currentOptional += 1
           if (isPresent) {
@@ -74,17 +75,17 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
       if (codec instanceof CrunchesBoolean) {
         this.$$booleans += 1
         decoderCode += `
-          booleanBackpatches.push({bit: currentBoolean & 7, index: currentBoolean >> 3, key: '${key}'})
+          booleanBackpatches.push({bit: currentBoolean & 7, index: currentBoolean >> 3, key: ${sanitizedKey}})
           currentBoolean += 1
         `
         encoderCode += `
-          booleanFlags[currentBoolean >> 3] |= (value['${key}'] ? 1 : 0) << (currentBoolean & 7)
+          booleanFlags[currentBoolean >> 3] |= (value[${sanitizedKey}] ? 1 : 0) << (currentBoolean & 7)
           currentBoolean += 1
         `
       }
       else {
-        decoderCode += `value['${key}'] = this.$$codecs[${i}].decodeFrom(view, target);`
-        encoderCode += `written += this.$$codecs[${i}].encodeInto(value['${key}'], view, byteOffset + written);`
+        decoderCode += `value[${sanitizedKey}] = this.$$codecs[${i}].decodeFrom(view, target);`
+        encoderCode += `written += this.$$codecs[${i}].encodeInto(value[${sanitizedKey}], view, byteOffset + written);`
       }
       if (property instanceof CrunchesOptional) {
         decoderCode += `

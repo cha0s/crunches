@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
 import {
   boolean,
@@ -124,4 +124,14 @@ test('property endianness', () => {
   encoded = object({1: uint32(), 2: uint32().littleEndian()}).bigEndian().encode({1: 123, 2: 234})
   expect(123).to.equal(encoded.getUint32(0, false))
   expect(234).to.equal(encoded.getUint32(4, true))
+})
+
+test('key sanitization', () => {
+  const key = "'], view, 0, console.log(), value['"
+  const codec = object({
+    [key]: uint8(),
+  })
+  const spy = vi.spyOn(console, 'log')
+  codec.decode(codec.encode({ [key]: 1 }))
+  expect(spy).not.toHaveBeenCalled()
 })
