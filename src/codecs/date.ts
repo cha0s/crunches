@@ -13,9 +13,7 @@ export class CrunchesDate extends CrunchesType<Date, CoercibleToDate> {
   }
 
   bigEndian(): this {
-    if (undefined === this.$$string.isLittleEndian) {
-      this.$$string.bigEndian()
-    }
+    this.$$string.bigEndian()
     return super.bigEndian()
   }
 
@@ -28,9 +26,7 @@ export class CrunchesDate extends CrunchesType<Date, CoercibleToDate> {
   }
 
   littleEndian(): this {
-    if (undefined === this.$$string.isLittleEndian) {
-      this.$$string.littleEndian()
-    }
+    this.$$string.littleEndian()
     return super.littleEndian()
   }
 

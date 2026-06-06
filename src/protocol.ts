@@ -77,8 +77,4 @@ export class Protocol<
     return written;
   }
 
-  infer<K extends keyof P>(_type: K) {
-    return undefined as P[K]['_output']
-  }
-
 }
