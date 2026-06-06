@@ -284,7 +284,7 @@ expect(schema.size(['foo', 'bar'])).to.equal(18)
 So, you've implemented a couple of packet schemas like:
 
 ```ts
-const heartbeat = uint8()
+const heartbeat = uint32()
 
 const message = object({
   body: string(),
