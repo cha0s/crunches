@@ -33,3 +33,8 @@ test('varuint boundaries', () => {
   expect(codec.decode(codec.encode(value))).not.to.equal(value)
 })
 
+test('coercion', () => {
+  const codec = varuint()
+  const value = 32.5
+  expect(codec.decode(codec.encode(value))).to.deep.equal(32)
+})
