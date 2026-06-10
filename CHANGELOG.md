@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.2](https://github.com/cha0s/crunches/compare/crunches-v3.1.1...crunches-v3.1.2) (2026-06-10)
+
+
+### Bug Fixes
+
+* small tidying of dead code ([e9f9d17](https://github.com/cha0s/crunches/commit/e9f9d179dc3942b8ed5f2fd1ae3540310f17fd01))
+* varint coercion ([7397735](https://github.com/cha0s/crunches/commit/739773562b9f30b50767a364ee7dc428b929c26c))
+
 ## [3.1.1](https://github.com/cha0s/crunches/compare/crunches-v3.1.0...crunches-v3.1.1) (2026-06-05)
 
 
