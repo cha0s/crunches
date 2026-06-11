@@ -4,6 +4,10 @@ import { varuint } from './codecs/varuint.ts'
 
 const varuintCodec = varuint();
 
+type Inputs<P extends Record<string, CrunchesType<unknown>>> = {
+  [K in keyof P]: { type: K; payload: P[K]['_input'] }
+}[keyof P];
+
 type Payloads<P extends Record<string, CrunchesType<unknown>>> = {
   [K in keyof P]: { type: K; payload: P[K]['_output'] }
 }[keyof P];
@@ -15,6 +19,8 @@ export class Protocol<
   P extends Record<string, CrunchesType<unknown>>
 > {
 
+  declare _P: P;
+  declare _inputs: Inputs<P>;
   declare _payloads: Payloads<P>;
 
   idToType = new Map<number, keyof P>();
