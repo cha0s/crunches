@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.3](https://github.com/cha0s/crunches/compare/crunches-v3.1.2...crunches-v3.1.3) (2026-06-11)
+
+
+### Bug Fixes
+
+* expose more types for protocol ([ba70f8f](https://github.com/cha0s/crunches/commit/ba70f8fe09698c71a90ef7c9b394ebfab9d152b0))
+
 ## [3.1.2](https://github.com/cha0s/crunches/compare/crunches-v3.1.1...crunches-v3.1.2) (2026-06-10)
 
 
