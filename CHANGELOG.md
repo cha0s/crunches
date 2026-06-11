@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.4](https://github.com/cha0s/crunches/compare/crunches-v3.1.3...crunches-v3.1.4) (2026-06-11)
+
+
+### Bug Fixes
+
+* exclude undefined from inferred optional object properties to satisfy exactOptionalPropertyTypes ([f8282a9](https://github.com/cha0s/crunches/commit/f8282a972ecfe6ccae9353c801a31de2e715d098))
+
 ## [3.1.3](https://github.com/cha0s/crunches/compare/crunches-v3.1.2...crunches-v3.1.3) (2026-06-11)
 
 
