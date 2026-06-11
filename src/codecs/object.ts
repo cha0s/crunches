@@ -19,11 +19,11 @@ type OptionalKeys<P extends Props> = {
 
 export type InferObjectOutput<P extends Props> =
   { [K in RequiredKeys<P>]:  P[K]['_output'] } &
-  { [K in OptionalKeys<P>]?: P[K]['_output'] }
+  { [K in OptionalKeys<P>]?: Exclude<P[K]['_output'], undefined> }
 
 export type InferObjectInput<P extends Props> =
   { [K in RequiredKeys<P>]:  P[K]['_input'] } &
-  { [K in OptionalKeys<P>]?: P[K]['_input'] }
+  { [K in OptionalKeys<P>]?: Exclude<P[K]['_input'], undefined> }
 
 type ObjectDecodeFunc<P extends Record<string, CrunchesBase<unknown, unknown>>> =
   (view: DataView, target: Target) => InferObjectOutput<P>
