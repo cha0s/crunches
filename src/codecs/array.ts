@@ -255,12 +255,16 @@ export class CrunchesArray<
       // sparse
       if (!isDense) {
         let i = 0
-        size += 4 + Math.ceil(i / 8)
+        const values = []
         for (const element of value) {
+          values.push(element)
+          i += 1
+        }
+        size += 4 + Math.ceil(i / 8)
+        for (const element of values) {
           if (undefined !== element) {
             size += this.$$elementCodec.sizeOf(element, size + byteOffset)
           }
-          i += 1
         }
       }
       else {
