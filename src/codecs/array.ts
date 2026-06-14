@@ -255,13 +255,13 @@ export class CrunchesArray<
       // sparse
       if (!isDense) {
         let i = 0
+        size += 4 + Math.ceil(i / 8)
         for (const element of value) {
           if (undefined !== element) {
             size += this.$$elementCodec.sizeOf(element, size + byteOffset)
           }
           i += 1
         }
-        size += 4 + Math.ceil(i / 8)
       }
       else {
         if (this.$$typedArray) {
@@ -296,13 +296,13 @@ export class CrunchesArray<
       if (!isDense) {
         let protocol = value[Symbol.iterator]()
         let result = protocol.next()
+        size += 4 + Math.ceil(this.length / 8)
         for (let i = 0; i < this.length; ++i) {
           if (undefined !== result.value) {
             size += this.$$elementCodec.sizeOf(result.value, size + byteOffset)
           }
           result = protocol.next()
         }
-        size += 4 + Math.ceil(this.length / 8)
       }
       else {
         if (this.$$typedArray) {
