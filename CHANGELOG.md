@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.2.1](https://github.com/cha0s/crunches/compare/crunches-v3.2.0...crunches-v3.2.1) (2026-06-14)
+
+
+### Bug Fixes
+
+* actually fix sparse presence encoding :) ([ec054da](https://github.com/cha0s/crunches/commit/ec054dae43e3bc3137ef4e632463e9ea1b37accd))
+* sparse presence encoding ([89bf993](https://github.com/cha0s/crunches/commit/89bf9932357d7f295a18364e7a114e35f66ce8b0))
+
 ## [3.2.0](https://github.com/cha0s/crunches/compare/crunches-v3.1.5...crunches-v3.2.0) (2026-06-14)
 
 
