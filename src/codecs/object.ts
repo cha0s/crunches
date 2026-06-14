@@ -31,6 +31,14 @@ type ObjectDecodeFunc<P extends Record<string, CrunchesBase<unknown, unknown>>> 
 type ObjectEncodeFunc<P extends Record<string, CrunchesBase<unknown, unknown>>> =
   (value: InferObjectInput<P>, view: DataView, byteOffset: number) => number
 
+type DeepOptional<P extends Record<string, CrunchesBase<unknown, unknown>>> = {
+  [K in keyof P]: P[K] extends CrunchesObject<infer Inner>
+    ? CrunchesOptional<CrunchesObject<DeepOptional<Inner>>>
+    : P[K] extends CrunchesOptional<any>
+      ? P[K]
+      : CrunchesOptional<P[K] extends CrunchesType<unknown, unknown> ? P[K] : never>
+}
+
 export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unknown>>>
   extends CrunchesType<InferObjectOutput<P>, InferObjectInput<P>>
 {
@@ -195,6 +203,23 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
 
   decodeFrom(view: DataView, target: Target) {
     return this.$$decodeFrom(view, target)
+  }
+
+  deepOptional(): CrunchesObject<DeepOptional<P>> {
+    const newProps: Record<string, CrunchesBase<unknown, unknown>> = {}
+    for (const key in this.props) {
+      const prop = this.props[key]
+      if (prop instanceof CrunchesOptional) {
+        newProps[key] = prop
+      }
+      else if (prop instanceof CrunchesObject) {
+        newProps[key] = prop.deepOptional().optional()
+      }
+      else {
+        newProps[key] = (prop as unknown as CrunchesType<unknown, unknown>).optional()
+      }
+    }
+    return object(newProps as DeepOptional<P>)
   }
 
   encodeInto(value: InferObjectInput<P>, view: DataView, byteOffset: number) {

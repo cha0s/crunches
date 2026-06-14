@@ -82,6 +82,27 @@ describe('documentation', () => {
     expect(schema.size({foo: 32})).to.equal(5)
   })
 
+  test ('deepOptional', () => {
+    const codec = object({
+      1: uint8(),
+      2: uint8(),
+      3: object({
+        4: uint8(),
+      }),
+    }).deepOptional()
+    let value
+    value = {1: 32, 2: 32, 3: {4: 32}}
+    expect(codec.size(value)).to.equal(5)
+    value = {1: 32, 2: 32, 3: {}}
+    expect(codec.size(value)).to.equal(4)
+    value = {1: 32, 2: 32}
+    expect(codec.size(value)).to.equal(3)
+    value = {1: 32}
+    expect(codec.size(value)).to.equal(2)
+    value = {}
+    expect(codec.size(value)).to.equal(1)
+  })
+
   test('array', () => {
     // 16 = array prefix (4) + uint32 (4) + uint32 (4) + uint32 (4)
     expect(array({element: uint32()}).size([1, 2, 3])).to.equal(16)
@@ -272,4 +293,3 @@ describe('documentation', () => {
   })
 
 })
-

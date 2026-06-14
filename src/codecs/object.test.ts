@@ -135,3 +135,29 @@ test('key sanitization', () => {
   codec.decode(codec.encode({ [key]: 1 }))
   expect(spy).not.toHaveBeenCalled()
 })
+
+test('deep optional', () => {
+  const codec = object({
+    1: uint8(),
+    2: uint8(),
+    3: object({
+      4: uint8(),
+    }),
+  }).deepOptional()
+  let value
+  value = {1: 32, 2: 32, 3: {4: 32}}
+  expect(codec.size(value)).to.equal(5)
+  expect(codec.decode(codec.encode(value))).to.deep.equal(value)
+  value = {1: 32, 2: 32, 3: {}}
+  expect(codec.size(value)).to.equal(4)
+  expect(codec.decode(codec.encode(value))).to.deep.equal(value)
+  value = {1: 32, 2: 32}
+  expect(codec.size(value)).to.equal(3)
+  expect(codec.decode(codec.encode(value))).to.deep.equal(value)
+  value = {1: 32}
+  expect(codec.size(value)).to.equal(2)
+  expect(codec.decode(codec.encode(value))).to.deep.equal(value)
+  value = {}
+  expect(codec.size(value)).to.equal(1)
+  expect(codec.decode(codec.encode(value))).to.deep.equal(value)
+})
