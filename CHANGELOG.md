@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/cha0s/crunches/compare/crunches-v3.1.5...crunches-v3.2.0) (2026-06-14)
+
+
+### Features
+
+* deepOptional method on CrunchesObject ([3fd28a4](https://github.com/cha0s/crunches/commit/3fd28a4125308b1d97519448e2b43e6d10b34afa))
+
 ## [3.1.5](https://github.com/cha0s/crunches/compare/crunches-v3.1.4...crunches-v3.1.5) (2026-06-14)
 
 
