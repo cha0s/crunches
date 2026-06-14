@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.5](https://github.com/cha0s/crunches/compare/crunches-v3.1.4...crunches-v3.1.5) (2026-06-14)
+
+
+### Bug Fixes
+
+* protocol alignment ([6a7fc2b](https://github.com/cha0s/crunches/commit/6a7fc2bed44bd12623c92301194e9df2723d471f))
+
 ## [3.1.4](https://github.com/cha0s/crunches/compare/crunches-v3.1.3...crunches-v3.1.4) (2026-06-11)
 
 
