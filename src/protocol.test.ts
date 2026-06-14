@@ -1,10 +1,21 @@
 import { expect, test } from 'vitest'
 
 import {
+  array,
+  CrunchesType,
+  float32,
+  float64,
+  int8,
+  int16,
+  int32,
+  int64,
   object,
   Protocol,
   string,
   uint8,
+  uint16,
+  uint32,
+  uint64,
 } from '#crunches'
 
 const protocol = new Protocol({
@@ -47,4 +58,45 @@ test('decodeFrom / encodeInto', () => {
     },
   ])
   expect(written).to.equal(size)
+})
+
+function testAllAlignments(element: CrunchesType<any>, value: any, length = 0) {
+  for (let i = 0; i < 8; ++i) {
+    const spec: Record<string, CrunchesType<any>> = {}
+    for (let j = 0; j < i; ++j) {
+      spec[`o${j}`] = int8()
+    }
+    spec.array = array({ element, length })
+    const codec = object(spec)
+    const protocol = new Protocol({
+      foo: codec,
+    })
+    const result: any = {}
+    for (let j = 0; j < i; ++j) {
+      result[`o${j}`] = j
+    }
+    result.array = value
+    expect(Array.from(protocol.decode(protocol.encode('foo', result)).payload.array)).to.deep.equal(Array.from(result.array))
+  }
+}
+
+test('alignment', () => {
+  for (const numberType of [
+    int8,
+    uint8,
+    int16,
+    uint16,
+    int32,
+    uint32,
+    float32,
+    float64,
+  ]) {
+    testAllAlignments(numberType(), [0, 1, 2])
+  }
+  for (const numberType of [
+    int64,
+    uint64,
+  ]) {
+    testAllAlignments(numberType(), [0n, 1n, 2n])
+  }
 })

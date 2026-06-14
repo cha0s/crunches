@@ -63,7 +63,9 @@ export class Protocol<
     if (!codec) {
       throw new TypeError(`Tried encoding unknown codec: '${String(type)}'`)
     }
-    const view = new DataView(new ArrayBuffer(varuintCodec.size(id) + codec.size(value)))
+    let size = varuintCodec.size(id)
+    size += codec.sizeOf(value, size)
+    const view = new DataView(new ArrayBuffer(size))
     this.encodeInto(type, value, view, 0)
     return view
   }
