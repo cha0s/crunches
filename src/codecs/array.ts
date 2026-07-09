@@ -86,7 +86,7 @@ export class CrunchesArray<
       target.byteOffset += 4
     }
     else {
-      length = this.length;
+      length = this.length
     }
     const isDense = this.$$isPossiblySparse ? this.$$isDenseCodec.decodeFrom(view, target) : true
     // sparse
@@ -223,7 +223,7 @@ export class CrunchesArray<
         }
       }
     }
-    return written;
+    return written
   }
 
   littleEndian(): this {

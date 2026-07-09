@@ -102,13 +102,13 @@ for (const numberType of [
         const protocol = value.values()
         return {
           next: () => {
-            let result = protocol.next();
+            let result = protocol.next()
             if (result.done) {
-              return {done: true, value: undefined};
+              return {done: true, value: undefined}
             }
-            return {done: false, value: result.value};
+            return {done: false, value: result.value}
           },
-        };
+        }
       }
     }
     expect(codec.decode(codec.encode(iterable))).to.deep.equal(value)
@@ -167,13 +167,13 @@ for (const numberType of [
         const protocol = value.values()
         return {
           next: () => {
-            let result = protocol.next();
+            let result = protocol.next()
             if (result.done) {
-              return {done: true, value: undefined};
+              return {done: true, value: undefined}
             }
-            return {done: false, value: result.value};
+            return {done: false, value: result.value}
           },
-        };
+        }
       }
     }
     expect(codec.decode(codec.encode(iterable))).to.deep.equal(value)

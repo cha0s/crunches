@@ -2,7 +2,7 @@ import { CrunchesType, type Target } from '#types'
 
 import { CrunchesArray, type CrunchesArrayInput } from './array.ts'
 
-type ExtractIterable<T> = T extends Iterable<infer V, any, any> ? V : never;
+type ExtractIterable<T> = T extends Iterable<infer V, any, any> ? V : never
 
 type MapValueMaybeUndefined<T, IsSparse> = IsSparse extends true
   ? T | undefined

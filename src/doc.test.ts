@@ -181,9 +181,9 @@ describe('documentation', () => {
 
     let lastReceivedHeartbeat: number = 0
     // infer payload type
-    const messages: ProtocolInfer<typeof protocol, 'message'>[] = [];
+    const messages: ProtocolInfer<typeof protocol, 'message'>[] = []
     socket.addEventListener('message', (event: MessageEvent) => {
-      const { type, payload } = protocol.decode(new DataView(event.data));
+      const { type, payload } = protocol.decode(new DataView(event.data))
       switch (type) {
         case 'heartbeat': {
           lastReceivedHeartbeat = payload
