@@ -7,6 +7,7 @@ import {
   CrunchesType,
   float32,
   int32,
+  json,
   map,
   object,
   type ProtocolInfer,
@@ -69,6 +70,15 @@ describe('documentation', () => {
     const view = new DataView(buffer)
     // pass the view to the encoder
     playerSchema.encodeInto(player, view, 0)
+  })
+
+  test('json', () => {
+    const codec = json({
+      replacer: ['foo'],
+      reviver: (_k: string, v: number) => v,
+      space: 2,
+    })
+    codec.encode({ foo: 'bar', whatever: 'this', could: { be: [1, 100.5, 'or anything else'] }})
   })
 
   test('object', () => {

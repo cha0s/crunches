@@ -5,6 +5,7 @@ import { CrunchesString } from './string.ts'
 type CoercibleToDate = Date | string | number
 
 export class CrunchesDate extends CrunchesType<Date, CoercibleToDate> {
+
   private readonly $$string: CrunchesString
 
   constructor(options?: { varuint?: boolean }) {
