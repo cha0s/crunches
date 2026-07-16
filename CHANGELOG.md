@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.0](https://github.com/cha0s/crunches/compare/crunches-v3.2.1...crunches-v3.3.0) (2026-07-16)
+
+
+### Features
+
+* JSON codec ([89d30d4](https://github.com/cha0s/crunches/commit/89d30d4dbcafee51b3df7210241a9a8699227766))
+
 ## [3.2.1](https://github.com/cha0s/crunches/compare/crunches-v3.2.0...crunches-v3.2.1) (2026-06-14)
 
 
