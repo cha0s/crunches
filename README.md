@@ -30,7 +30,7 @@ const player = {
   position: [-540.2378623, 343.183749, 1201.23897468],
   health: 4000,
   jumping: false,
-  attributes: {str: 87, agi: 42, int: 22},
+  attributes: { str: 87, agi: 42, int: 22 },
 }
 
 // encode the value to a new `DataView`
@@ -137,11 +137,11 @@ const schema = object({
 //   optional flag (1) +
 //   string prefix (4) +
 //   'hello'       (5)
-expect(schema.size({foo: 32, bar: 'hello'})).to.equal(14)
+expect(schema.size({ foo: 32, bar: 'hello' })).to.equal(14)
 // 5 =
 //   uint32        (4) +
 //   optional flag (1)
-expect(schema.size({foo: 32})).to.equal(5)
+expect(schema.size({ foo: 32 })).to.equal(5)
 ```
 
 #### `deepOptional`
@@ -157,13 +157,13 @@ const codec = object({
   }),
 }).deepOptional()
 let value
-value = {1: 32, 2: 32, 3: {4: 32}}
+value = { 1: 32, 2: 32, 3: { 4: 32 } }
 expect(codec.size(value)).to.equal(5)
-value = {1: 32, 2: 32, 3: {}}
+value = { 1: 32, 2: 32, 3: {} }
 expect(codec.size(value)).to.equal(4)
-value = {1: 32, 2: 32}
+value = { 1: 32, 2: 32 }
 expect(codec.size(value)).to.equal(3)
-value = {1: 32}
+value = { 1: 32 }
 expect(codec.size(value)).to.equal(2)
 value = {}
 expect(codec.size(value)).to.equal(1)

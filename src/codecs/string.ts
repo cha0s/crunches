@@ -34,7 +34,7 @@ export class CrunchesString extends CrunchesType<string> {
 
   encodeInto(value: string, view: DataView, byteOffset: number) {
     const prefixLength = this.prefix.sizeOf(value.length * 3)
-    const {written} = encoder.encodeInto(
+    const { written } = encoder.encodeInto(
       value,
       new Uint8Array(view.buffer, view.byteOffset + byteOffset + prefixLength),
     )

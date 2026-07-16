@@ -51,7 +51,7 @@ export class Protocol<
     if (!codec) {
       throw new TypeError(`Tried decoding unknown codec: '${String(type)}'`)
     }
-    return {type, payload: codec.decodeFrom(view, target)} as Payloads<P>
+    return { type, payload: codec.decodeFrom(view, target) } as Payloads<P>
   }
 
   encode<K extends keyof P>(type: K, value: P[K]['_input']) {

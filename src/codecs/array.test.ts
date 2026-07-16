@@ -104,9 +104,9 @@ for (const numberType of [
           next: () => {
             let result = protocol.next()
             if (result.done) {
-              return {done: true, value: undefined}
+              return { done: true, value: undefined }
             }
-            return {done: false, value: result.value}
+            return { done: false, value: result.value }
           },
         }
       }
@@ -169,9 +169,9 @@ for (const numberType of [
           next: () => {
             let result = protocol.next()
             if (result.done) {
-              return {done: true, value: undefined}
+              return { done: true, value: undefined }
             }
-            return {done: false, value: result.value}
+            return { done: false, value: result.value }
           },
         }
       }
@@ -348,37 +348,37 @@ for (const numberType of [
 
 test('prefix endianness', () => {
   // big
-  expect(3).to.equal(array({element: uint32()}).bigEndian().encode([1, 2, 3]).getUint32(0, false))
+  expect(3).to.equal(array({ element: uint32() }).bigEndian().encode([1, 2, 3]).getUint32(0, false))
   // default (little)
-  expect(3).to.equal(array({element: uint32()}).encode([1, 2, 3]).getUint32(0, true))
+  expect(3).to.equal(array({ element: uint32() }).encode([1, 2, 3]).getUint32(0, true))
   // little
-  expect(3).to.equal(array({element: uint32()}).littleEndian().encode([1, 2, 3]).getUint32(0, true))
+  expect(3).to.equal(array({ element: uint32() }).littleEndian().encode([1, 2, 3]).getUint32(0, true))
 })
 
 test('element endianness', () => {
   let encoded
   // big
-  encoded = array({element: uint32(), length: 3}).bigEndian().encode([1, 2, 3])
+  encoded = array({ element: uint32(), length: 3 }).bigEndian().encode([1, 2, 3])
   for (let i = 0; i < 3; ++i) {
     expect(i + 1).to.equal(encoded.getUint32(4 * i, false))
   }
   // overridden (little)
-  encoded = array({element: uint32().littleEndian(), length: 3}).bigEndian().encode([1, 2, 3])
+  encoded = array({ element: uint32().littleEndian(), length: 3 }).bigEndian().encode([1, 2, 3])
   for (let i = 0; i < 3; ++i) {
     expect(i + 1).to.equal(encoded.getUint32(4 * i, true))
   }
   // default (little)
-  encoded = array({element: uint32(), length: 3}).encode([1, 2, 3])
+  encoded = array({ element: uint32(), length: 3 }).encode([1, 2, 3])
   for (let i = 0; i < 3; ++i) {
     expect(i + 1).to.equal(encoded.getUint32(4 * i, true))
   }
   // little
-  encoded = array({element: uint32(), length: 3}).littleEndian().encode([1, 2, 3])
+  encoded = array({ element: uint32(), length: 3 }).littleEndian().encode([1, 2, 3])
   for (let i = 0; i < 3; ++i) {
     expect(i + 1).to.equal(encoded.getUint32(4 * i, true))
   }
   // overridden (big)
-  encoded = array({element: uint32().bigEndian(), length: 3}).littleEndian().encode([1, 2, 3])
+  encoded = array({ element: uint32().bigEndian(), length: 3 }).littleEndian().encode([1, 2, 3])
   for (let i = 0; i < 3; ++i) {
     expect(i + 1).to.equal(encoded.getUint32(4 * i, false))
   }

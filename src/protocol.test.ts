@@ -42,7 +42,7 @@ test('decodeFrom / encodeInto', () => {
   const view = new DataView(new ArrayBuffer(size))
   let written = 0
   written += protocol.encodeInto('food', 'yummy', view, written)
-  written += protocol.encodeInto('foo', {bar: 67}, view, written)
+  written += protocol.encodeInto('foo', { bar: 67 }, view, written)
   const results = []
   const target = { byteOffset: 0 }
   results.push(protocol.decodeFrom(view, target))

@@ -40,7 +40,7 @@ describe('documentation', () => {
     position: [-540.2378623, 343.183749, 1201.23897468],
     health: 4000,
     jumping: false,
-    attributes: {str: 87, agi: 42, int: 22},
+    attributes: { str: 87, agi: 42, int: 22 },
   }
 
   test('player schema', () => {
@@ -87,9 +87,9 @@ describe('documentation', () => {
       bar: string().optional(),
     })
     // 14 = uint32 (4) + optional flag (1) + string prefix (4) + 'hello' (5)
-    expect(schema.size({foo: 32, bar: 'hello'})).to.equal(14)
+    expect(schema.size({ foo: 32, bar: 'hello' })).to.equal(14)
     // 5 = uint32 (4) + optional flag (1)
-    expect(schema.size({foo: 32})).to.equal(5)
+    expect(schema.size({ foo: 32 })).to.equal(5)
   })
 
   test ('deepOptional', () => {
@@ -101,13 +101,13 @@ describe('documentation', () => {
       }),
     }).deepOptional()
     let value
-    value = {1: 32, 2: 32, 3: {4: 32}}
+    value = { 1: 32, 2: 32, 3: { 4: 32 } }
     expect(codec.size(value)).to.equal(5)
-    value = {1: 32, 2: 32, 3: {}}
+    value = { 1: 32, 2: 32, 3: {} }
     expect(codec.size(value)).to.equal(4)
-    value = {1: 32, 2: 32}
+    value = { 1: 32, 2: 32 }
     expect(codec.size(value)).to.equal(3)
-    value = {1: 32}
+    value = { 1: 32 }
     expect(codec.size(value)).to.equal(2)
     value = {}
     expect(codec.size(value)).to.equal(1)
@@ -115,9 +115,9 @@ describe('documentation', () => {
 
   test('array', () => {
     // 16 = array prefix (4) + uint32 (4) + uint32 (4) + uint32 (4)
-    expect(array({element: uint32()}).size([1, 2, 3])).to.equal(16)
+    expect(array({ element: uint32() }).size([1, 2, 3])).to.equal(16)
     // 12 = uint32 (4) + uint32 (4) + uint32 (4)
-    expect(array({element: uint32(), length: 3}).size([1, 2, 3])).to.equal(12)
+    expect(array({ element: uint32(), length: 3 }).size([1, 2, 3])).to.equal(12)
   })
 
   test('sparse array', () => {
@@ -213,7 +213,7 @@ describe('documentation', () => {
     }))
 
     expect(lastReceivedHeartbeat).to.equal(1234)
-    expect(messages).to.deep.equal([{body: 'Hello!', from: 'admin'}])
+    expect(messages).to.deep.equal([{ body: 'Hello!', from: 'admin' }])
   })
 
   test('optional size', () => {

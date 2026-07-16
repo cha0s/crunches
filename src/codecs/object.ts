@@ -83,7 +83,7 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
       if (codec instanceof CrunchesBoolean) {
         this.$$booleans += 1
         decoderCode += `
-          booleanBackpatches.push({bit: currentBoolean & 7, index: currentBoolean >> 3, key: ${sanitizedKey}})
+          booleanBackpatches.push({ bit: currentBoolean & 7, index: currentBoolean >> 3, key: ${sanitizedKey} })
           currentBoolean += 1
         `
         encoderCode += `
@@ -119,7 +119,7 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
             booleanFlags.push(view.getUint8(target.byteOffset))
             target.byteOffset += 1
           }
-          for (const {bit, index, key} of booleanBackpatches) {
+          for (const { bit, index, key } of booleanBackpatches) {
             value[key] = !!(booleanFlags[index] & (1 << bit))
           }
         }

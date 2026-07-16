@@ -18,7 +18,7 @@ test('unicode', () => {
 })
 
 test('varuint-prefixed string', () => {
-  const codec = string({varuint: true})
+  const codec = string({ varuint: true })
   const value = 'hello world'
   expect(codec.decode(codec.encode(value))).to.deep.equal(value)
 })
