@@ -19,14 +19,14 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ lts/jod, latest ]
+        node-version: [ lts, latest ]
 
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: ⎔ Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
