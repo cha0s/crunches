@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.1](https://github.com/cha0s/crunches/compare/crunches-v3.3.0...crunches-v3.3.1) (2026-07-17)
+
+
+### Code Refactoring
+
+* export JSON options ([e96b4e6](https://github.com/cha0s/crunches/commit/e96b4e67566954e12a5122d32d74fc50a9e05759))
+
 ## [3.3.0](https://github.com/cha0s/crunches/compare/crunches-v3.2.1...crunches-v3.3.0) (2026-07-16)
 
 
