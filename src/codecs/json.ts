@@ -21,7 +21,7 @@ export type CrunchesJSONInput = (
   | { toJSON: () => CrunchesJSONOutput }
 )
 
-interface CrunchesJsonOptions {
+export interface CrunchesJsonOptions {
   replacer?: any
   reviver?: any
   space?: any
