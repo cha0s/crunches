@@ -98,6 +98,8 @@ You may `encodeInto` a view over any existing `ArrayBuffer` **provided that it's
 | varint                | <table><tr><th>size</th><th>min</th><th>max</th></tr><tr><td>1</td><td>-64</td><td>63</td></tr><tr><td>2</td><td>-8,192</td><td>8,191</td></tr><tr><td>3</td><td>-1,048,576</td><td>1,048,575</td></tr><tr><td>4</td><td>-134,217,728</td><td>134,217,727</td></tr><tr><td>5</td><td>-2,147,483,648</td><td>2,147,483,647</td></tr></table> | -2,147,483,648 to 2,147,483,647                                                                                                                                                                                |
 | date                  | Same as `string` above after calling [`toIsoString`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)                                                                                                                                                                                     | Value is coerced to `Date` e.g. `new Date(value).toIsoString()`                                                                                                                                                |
 
+## Aggregate types
+
 ### `json`
 
 Uses the `string` codec after calling [`JSON.stringify`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) on the value.
@@ -123,8 +125,6 @@ const codec = json({
 })
 codec.encode({ foo: 'bar', whatever: 'this', could: { be: [1, 100.5, 'or anything else'] }})
 ```
-
-## Aggregate types
 
 ### `object`
 
