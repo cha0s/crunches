@@ -97,9 +97,10 @@ You may `encodeInto` a view over any existing `ArrayBuffer` **provided that it's
 | varuint               | <table><tr><th>size</th><th>min</th><th>max</th></tr><tr><td>1</td><td>0</td><td>127</td></tr><tr><td>2</td><td>128</td><td>16,383</td></tr><tr><td>3</td><td>16,384</td><td>2,097,151</td></tr><tr><td>4</td><td>2,097,152</td><td>268,435,455</td></tr><tr><td>5</td><td>268,435,456</td><td>4,294,967,295</td></tr></table>              | 0 to 4,294,967,295                                                                                                                                                                                             |
 | varint                | <table><tr><th>size</th><th>min</th><th>max</th></tr><tr><td>1</td><td>-64</td><td>63</td></tr><tr><td>2</td><td>-8,192</td><td>8,191</td></tr><tr><td>3</td><td>-1,048,576</td><td>1,048,575</td></tr><tr><td>4</td><td>-134,217,728</td><td>134,217,727</td></tr><tr><td>5</td><td>-2,147,483,648</td><td>2,147,483,647</td></tr></table> | -2,147,483,648 to 2,147,483,647                                                                                                                                                                                |
 | date                  | Same as `string` above after calling [`toIsoString`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)                                                                                                                                                                                     | Value is coerced to `Date` e.g. `new Date(value).toIsoString()`                                                                                                                                                |
-| json                  | Same as `string` above after calling [`JSON.stringify`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)                                                                                                                                                                                    | Any valid JSON value, including any object instance with a `toJSON` method defined.                                                                                                                            |
 
 ### `json`
+
+Uses the `string` codec after calling [`JSON.stringify`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) on the value.
 
 Accepts options for [`JSON.stringify`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify):
 
@@ -109,6 +110,10 @@ Accepts options for [`JSON.stringify`](https://developer.mozilla.org/en-US/docs/
 and [`JSON.parse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse):
 
 - [`reviver`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#reviver)
+
+Encodes any valid JSON value, including any object instance with a `toJSON` method defined.
+
+Example:
 
 ```ts
 const codec = json({
