@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.4](https://github.com/cha0s/crunches/compare/crunches-v3.3.3...crunches-v3.3.4) (2026-07-25)
+
+
+### Miscellaneous Chores
+
+* comments ([e33f1f1](https://github.com/cha0s/crunches/commit/e33f1f11bf8d4a5c0f9e147b86753374f7a0a812))
+
 ## [3.3.3](https://github.com/cha0s/crunches/compare/crunches-v3.3.2...crunches-v3.3.3) (2026-07-25)
 
 
