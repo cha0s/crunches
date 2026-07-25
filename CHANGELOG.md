@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.3](https://github.com/cha0s/crunches/compare/crunches-v3.3.2...crunches-v3.3.3) (2026-07-25)
+
+
+### Miscellaneous Chores
+
+* attempting trusted publishing ([28b6ad7](https://github.com/cha0s/crunches/commit/28b6ad7d364133baf859c6e8cac5fdef7b2b88d0))
+
 ## [3.3.2](https://github.com/cha0s/crunches/compare/crunches-v3.3.1...crunches-v3.3.2) (2026-07-25)
 
 
