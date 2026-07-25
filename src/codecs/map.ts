@@ -8,6 +8,9 @@ type MapValueMaybeUndefined<T, IsSparse> = IsSparse extends true
   ? T | undefined
   : T
 
+/**
+ * Map codec.
+ */
 export class CrunchesMap <
   K extends CrunchesType<unknown, unknown>,
   V extends CrunchesType<unknown, unknown>,
@@ -96,6 +99,13 @@ export class CrunchesMap <
 
 }
 
+/**
+ * Create map codec.
+ * @param options Map options.
+ * @param options.key Key codec.
+ * @param options.value Value codec.
+ * @param options.sparse Whether the codec accepts sparse maps (carries a performance penalty).
+ */
 export function map<
   K extends CrunchesType<unknown, unknown>,
   V extends CrunchesType<unknown, unknown>,

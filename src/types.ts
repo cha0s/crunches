@@ -1,4 +1,7 @@
 export type Target = {
+  /**
+   * The offset from which to start decoding.
+   */
   byteOffset: number
 }
 
@@ -8,23 +11,50 @@ export abstract class CrunchesBase<Output, Input = Output> {
   declare _input: Input
   isLittleEndian: boolean | undefined
 
+  /**
+   * Set this type to big-endian encoding.
+   */
   bigEndian(): this {
     this.isLittleEndian = false
     return this
   }
 
+  /**
+   * Decode a value from a DataView.
+   * @param view The DataView to decode from.
+   * @param target Target location.
+   * @param target.byteOffset The offset from which to start decoding.
+   */
   abstract decodeFrom(view: DataView, target: Target): Output
 
+  /**
+   * Encode a value into a DataView.
+   * @param value The value to encode.
+   * @param view The DataView to encode into.
+   * @param byteOffset The offset from which to start encoding.
+   * @returns The number of bytes written
+   */
   abstract encodeInto(value: Input, view: DataView, byteOffset: number): number
 
+  /**
+   * Set this type to little-endian encoding.
+   */
   littleEndian(): this {
     this.isLittleEndian = true
     return this
   }
 
-  // the amount of padding necessary before writing this type at `byteOffset`
+  /**
+   * The amount of padding necessary before writing this type at `byteOffset`.
+   * @param byteOffset The offset from which encoding will start.
+   */
   padding(_byteOffset: number): number { return 0 }
 
+  /**
+   * The size of the encoded value, in bytes.
+   * @param value The value to encode.
+   * @param byteOffset The offset from which encoding will start.
+   */
   abstract sizeOf(value: Input, byteOffset: number): number
 }
 
@@ -32,24 +62,46 @@ export abstract class CrunchesType<Output, Input = Output> extends CrunchesBase<
 
   declare readonly $$nonOptional: true
 
+  /**
+   * Allocate a new DataView to fit the size of the encoded value.
+   * @param value The value to encode.
+   * @returns The DataView.
+   */
   allocate(value: Input) {
     return new DataView(new ArrayBuffer(this.size(value)))
   }
 
+  /**
+   * Decode a value from a DataView.
+   * @param view The DataView.
+   * @returns The decoded value.
+   */
   decode(view: DataView) {
     return this.decodeFrom(view, { byteOffset: 0 })
   }
 
+  /**
+   * Encode a value into a DataView.
+   * @param value The value to encode.
+   * @returns The DataView into which the value was encoded.
+   */
   encode(value: Input) {
     const view = this.allocate(value)
     this.encodeInto(value, view, 0)
     return view
   }
 
+  /**
+   * Mark this codec as optional. Mainly used for object codec properties.
+   */
   optional(): CrunchesOptional<this> {
     return new CrunchesOptional(this)
   }
 
+  /**
+   * Compute the size of an encoded value.
+   * @param value The value whose size to compute.
+   */
   size(value: Input) {
     return this.sizeOf(value, 0)
   }

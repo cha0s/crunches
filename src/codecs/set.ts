@@ -2,14 +2,17 @@ import { CrunchesType, type Target } from '#types'
 
 import { CrunchesArray } from './array.ts'
 
+/**
+ * Set codec.
+ */
 export class CrunchesSet<E extends CrunchesType<unknown, unknown>>
   extends CrunchesType<Set<E['_output']>, Set<E['_input']> | Iterable<E['_input']>>
 {
   private readonly $$array: CrunchesArray<E>
 
-  constructor({ element, length }: { element: E; length?: number }) {
+  constructor({ element }: { element: E }) {
     super()
-    this.$$array = new CrunchesArray({ element, length })
+    this.$$array = new CrunchesArray({ element })
   }
 
   bigEndian(): this {
@@ -58,6 +61,11 @@ export class CrunchesSet<E extends CrunchesType<unknown, unknown>>
   }
 }
 
+/**
+ * Create set codec.
+ * @param options Set options.
+ * @param options.element The element type.
+ */
 export const set = <E extends CrunchesType<unknown, unknown>>(
-  options: { element: E; length?: number }
+  options: { element: E }
 ) => new CrunchesSet(options)

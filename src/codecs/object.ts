@@ -39,6 +39,9 @@ type DeepOptional<P extends Record<string, CrunchesBase<unknown, unknown>>> = {
       : CrunchesOptional<P[K] extends CrunchesType<unknown, unknown> ? P[K] : never>
 }
 
+/**
+ * Object codec.
+ */
 export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unknown>>>
   extends CrunchesType<InferObjectOutput<P>, InferObjectInput<P>>
 {
@@ -241,5 +244,9 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
 
 }
 
+/**
+ * Create object codec.
+ * @param props The properties' codecs.
+ */
 export const object = <P extends Record<string, CrunchesBase<unknown, unknown>>>(props: P) =>
   new CrunchesObject(props)

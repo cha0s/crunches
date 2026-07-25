@@ -4,6 +4,9 @@ import { CrunchesString } from './string.ts'
 
 type CoercibleToDate = Date | string | number
 
+/**
+ * Date codec.
+ */
 export class CrunchesDate extends CrunchesType<Date, CoercibleToDate> {
 
   private readonly $$string: CrunchesString
@@ -36,4 +39,9 @@ export class CrunchesDate extends CrunchesType<Date, CoercibleToDate> {
   }
 }
 
+/**
+ * Create date codec.
+ * @param options Date options.
+ * @param options.varuint Whether to use a varuint prefix (default: false).
+ */
 export const date = (options?: { varuint?: boolean }) => new CrunchesDate(options)

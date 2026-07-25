@@ -1,5 +1,8 @@
 import { CrunchesNumeric, type Target } from '#types'
 
+/**
+ * 64-bit unsigned BigInt codec.
+ */
 export class CrunchesUint64 extends CrunchesNumeric<bigint> {
   readonly byteWidth = 8
   readonly typedArray = BigUint64Array
@@ -17,4 +20,7 @@ export class CrunchesUint64 extends CrunchesNumeric<bigint> {
   }
 }
 
+/**
+ * Create 64-bit unsigned BigInt codec.
+ */
 export const uint64 = () => new CrunchesUint64()

@@ -1,5 +1,8 @@
 import { CrunchesNumeric, type Target } from '#types'
 
+/**
+ * 32-bit unsigned integer codec.
+ */
 export class CrunchesUint32 extends CrunchesNumeric {
   readonly byteWidth = 4
   readonly typedArray = Uint32Array
@@ -17,4 +20,7 @@ export class CrunchesUint32 extends CrunchesNumeric {
   }
 }
 
+/**
+ * Create 32-bit unsigned integer codec.
+ */
 export const uint32 = () => new CrunchesUint32()

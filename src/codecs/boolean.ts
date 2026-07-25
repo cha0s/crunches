@@ -1,5 +1,8 @@
 import { CrunchesType, type Target } from '#types'
 
+/**
+ * Boolean codec.
+ */
 export class CrunchesBoolean extends CrunchesType<boolean, any> {
   decodeFrom(view: DataView, target: Target) {
     const value = !!view.getUint8(target.byteOffset)
@@ -15,4 +18,7 @@ export class CrunchesBoolean extends CrunchesType<boolean, any> {
   }
 }
 
+/**
+ * Create boolean codec.
+ */
 export const boolean = () => new CrunchesBoolean()

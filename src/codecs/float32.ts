@@ -1,5 +1,8 @@
 import { CrunchesNumeric, type Target } from '#types'
 
+/**
+ * Single-precision floating-point codec.
+ */
 export class CrunchesFloat32 extends CrunchesNumeric {
   readonly byteWidth = 4
   readonly typedArray = Float32Array
@@ -17,4 +20,7 @@ export class CrunchesFloat32 extends CrunchesNumeric {
   }
 }
 
+/**
+ * Create single-precision floating-point codec.
+ */
 export const float32 = () => new CrunchesFloat32()

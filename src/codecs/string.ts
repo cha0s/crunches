@@ -6,6 +6,9 @@ import { CrunchesVarUint } from './varuint.ts'
 const decoder = new TextDecoder()
 const encoder = new TextEncoder()
 
+/**
+ * String codec.
+ */
 export class CrunchesString extends CrunchesType<string> {
 
   prefix: CrunchesUint32 | CrunchesVarUint
@@ -55,4 +58,9 @@ export class CrunchesString extends CrunchesType<string> {
 
 }
 
+/**
+ * Create string codec.
+ * @param options Buffer options.
+ * @param options.varuint Whether to use a varuint prefix (default: false).
+ */
 export const string = (options: { varuint?: boolean } = {}) => new CrunchesString(options)

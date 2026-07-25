@@ -1,5 +1,8 @@
 import { CrunchesNumeric, type Target } from '#types'
 
+/**
+ * 16-bit signed integer codec.
+ */
 export class CrunchesInt16 extends CrunchesNumeric {
   readonly byteWidth = 2
   readonly typedArray = Int16Array
@@ -17,4 +20,7 @@ export class CrunchesInt16 extends CrunchesNumeric {
   }
 }
 
+/**
+ * Create 16-bit signed integer codec.
+ */
 export const int16 = () => new CrunchesInt16()

@@ -2,6 +2,9 @@ import { type Target } from '#types'
 
 import { CrunchesVarUint } from './varuint.ts'
 
+/**
+ * Signed varint codec.
+ */
 export class CrunchesVarInt extends CrunchesVarUint {
   decodeFrom(view: DataView, target: Target) {
     const varuint = super.decodeFrom(view, target)
@@ -18,4 +21,7 @@ export class CrunchesVarInt extends CrunchesVarUint {
   }
 }
 
+/**
+ * Create signed varint codec.
+ */
 export const varint = () => new CrunchesVarInt()

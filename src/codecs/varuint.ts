@@ -1,5 +1,8 @@
 import { CrunchesType, type Target } from '#types'
 
+/**
+ * Unsigned varint codec.
+ */
 export class CrunchesVarUint extends CrunchesType<number> {
   decodeFrom(view: DataView, target: Target) {
     const byte0 = view.getUint8(target.byteOffset)
@@ -56,4 +59,7 @@ export class CrunchesVarUint extends CrunchesType<number> {
   }
 }
 
+/**
+ * Create unsigned varint codec.
+ */
 export const varuint = () => new CrunchesVarUint()

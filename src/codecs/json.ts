@@ -22,12 +22,27 @@ export type CrunchesJSONInput = (
 )
 
 export interface CrunchesJsonOptions {
+  /**
+   * A function that alters the behavior of the stringification process.
+   */
   replacer?: any
+  /**
+   * Prescribes how each value originally produced by parsing is transformed before being returned.
+   */
   reviver?: any
+  /**
+   * A string or number that's used to insert white space.
+   */
   space?: any
+  /**
+   * Whether to use a varuint prefix (default: false).
+   */
   varuint?: boolean
 }
 
+/**
+ * JSON codec.
+ */
 export class CrunchesJson extends CrunchesType<CrunchesJSONOutput, CrunchesJSONInput> {
 
   private readonly $$replacer: any
@@ -75,4 +90,12 @@ export class CrunchesJson extends CrunchesType<CrunchesJSONOutput, CrunchesJSONI
 
 }
 
+/**
+ * Create JSON codec.
+ * @param options JSON options.
+ * @param options.replacer A function that alters the behavior of the stringification process.
+ * @param options.reviver Prescribes how each value originally produced by parsing is transformed before being returned.
+ * @param options.space A string or number that's used to insert white space.
+ * @param options.varuint Whether to use a varuint prefix (default: false).
+ */
 export const json = (options?: CrunchesJsonOptions) => new CrunchesJson(options)

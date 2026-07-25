@@ -1,5 +1,8 @@
 import { CrunchesNumeric, type Target } from '#types'
 
+/**
+ * 8-bit unsigned integer codec.
+ */
 export class CrunchesUint8 extends CrunchesNumeric {
   readonly byteWidth = 1
   readonly typedArray = Uint8Array
@@ -17,4 +20,7 @@ export class CrunchesUint8 extends CrunchesNumeric {
   }
 }
 
+/**
+ * Create 8-bit unsigned integer codec.
+ */
 export const uint8 = () => new CrunchesUint8

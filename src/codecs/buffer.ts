@@ -3,6 +3,9 @@ import { CrunchesType, type Target } from '#types'
 import { CrunchesUint32 } from './uint32.ts'
 import { CrunchesVarUint } from './varuint.ts'
 
+/**
+ * Buffer codec.
+ */
 export class CrunchesBuffer extends CrunchesType<DataView, ArrayBufferLike> {
 
   prefix: CrunchesUint32 | CrunchesVarUint
@@ -32,4 +35,9 @@ export class CrunchesBuffer extends CrunchesType<DataView, ArrayBufferLike> {
 
 }
 
+/**
+ * Create buffer codec.
+ * @param options Buffer options.
+ * @param options.varuint Whether to use a varuint prefix (default: false).
+ */
 export const buffer = (options: { varuint?: boolean } = {}) => new CrunchesBuffer(options)

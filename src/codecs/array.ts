@@ -33,6 +33,9 @@ export type CrunchesArrayOutput<
     ? TypedArrayFor<E>
     : Array<ArrayElementMaybeUndefined<E['_output'], IsSparse>>
 
+/**
+ * Array codec.
+ */
 export class CrunchesArray<
   E extends CrunchesType<any>,
   IsSparse extends boolean = false
@@ -332,6 +335,13 @@ export class CrunchesArray<
 
 }
 
+/**
+ * Create array codec.
+ * @param options Array options.
+ * @param options.element The element type.
+ * @param options.length Optional length of the (fixed-size) array.
+ * @param options.sparse Whether the codec accepts sparse arrays (carries a performance penalty).
+ */
 export function array<
   E extends CrunchesType<any>,
   IsSparse extends boolean = false

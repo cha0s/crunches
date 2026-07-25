@@ -15,6 +15,9 @@ type Payloads<P extends Record<string, CrunchesType<unknown>>> = {
 export type ProtocolInfer<T extends Protocol<any>, K extends T['_payloads']['type']> =
   Extract<T['_payloads'], { type: K }>['payload']
 
+/**
+ * Define a protocol; a mapping of string names to codecs.
+ */
 export class Protocol<
   P extends Record<string, CrunchesType<unknown>>
 > {
@@ -37,10 +40,22 @@ export class Protocol<
     }
   }
 
+  /**
+   * Decode a packet.
+   * @param view The DataView from which to decode.
+   * @returns The decoded packet.
+   */
   decode(view: DataView) {
     return this.decodeFrom(view, { byteOffset: 0 })
   }
 
+  /**
+   * Decode a packet from a DataView
+   * @param view The DataView to decode from.
+   * @param target Target location.
+   * @param target.byteOffset The offset from which to start decoding.
+   * @returns The decoded packet.
+   */
   decodeFrom(view: DataView, target: Target) {
     const id = varuintCodec.decodeFrom(view, target)
     const type = this.idToType.get(id)
@@ -54,7 +69,13 @@ export class Protocol<
     return { type, payload: codec.decodeFrom(view, target) } as Payloads<P>
   }
 
-  encode<K extends keyof P>(type: K, value: P[K]['_input']) {
+  /**
+   * Encode a packet.
+   * @param type The packet type.
+   * @param payload The payload to encode.
+   * @returns A DataView containing the encoded packet.
+   */
+  encode<K extends keyof P>(type: K, payload: P[K]['_input']) {
     const id = this.typeToId.get(type)
     if (!id) {
       throw new TypeError(`Tried encoding unknown codec: '${String(type)}'`)
@@ -64,12 +85,20 @@ export class Protocol<
       throw new TypeError(`Tried encoding unknown codec: '${String(type)}'`)
     }
     let size = varuintCodec.size(id)
-    size += codec.sizeOf(value, size)
+    size += codec.sizeOf(payload, size)
     const view = new DataView(new ArrayBuffer(size))
-    this.encodeInto(type, value, view, 0)
+    this.encodeInto(type, payload, view, 0)
     return view
   }
 
+  /**
+   * Enbcode a packet into a DataView.
+   * @param type The packet type.
+   * @param payload The payload to encode.
+   * @param view The DataView to encode into.
+   * @param byteOffset The offset from which to start encoding.
+   * @returns The number of bytes written.
+   */
   encodeInto<K extends keyof P>(type: K, value: P[K]['_input'], view: DataView, byteOffset: number) {
     const id = this.typeToId.get(type)
     if (!id) {
