@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.3.5](https://github.com/cha0s/crunches/compare/crunches-v3.3.4...crunches-v3.3.5) (2026-07-30)
+
+
+### Bug Fixes
+
+* buffer offset ([79de53e](https://github.com/cha0s/crunches/commit/79de53ed78f85f2d729d8809b2b755df77ead6df))
+* error messages ([e8b4ab9](https://github.com/cha0s/crunches/commit/e8b4ab9f19bd0c5d9cc6b281c868a65cc174dcd2))
+* inner endianness ([be678c9](https://github.com/cha0s/crunches/commit/be678c93a83a37e87f7c1de0e9a06cf59dd384cd))
+
 ## [3.3.4](https://github.com/cha0s/crunches/compare/crunches-v3.3.3...crunches-v3.3.4) (2026-07-25)
 
 
