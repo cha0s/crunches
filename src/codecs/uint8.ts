@@ -23,4 +23,4 @@ export class CrunchesUint8 extends CrunchesNumeric {
 /**
  * Create 8-bit unsigned integer codec.
  */
-export const uint8 = () => new CrunchesUint8
+export const uint8 = () => new CrunchesUint8()
