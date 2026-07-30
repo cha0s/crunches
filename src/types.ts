@@ -118,12 +118,22 @@ export class CrunchesOptional<Inner extends CrunchesType<unknown, unknown>>
     this.inner = inner
   }
 
+  bigEndian(): this {
+    this.inner.isLittleEndian = false
+    return this
+  }
+
   decodeFrom(view: DataView, target: Target) {
     return this.inner.decodeFrom(view, target)
   }
 
   encodeInto(value: Inner['_input'] | undefined, view: DataView, byteOffset: number) {
     return this.inner.encodeInto(value, view, byteOffset)
+  }
+
+  littleEndian(): this {
+    this.inner.isLittleEndian = true
+    return this
   }
 
   sizeOf(value: Inner['_input'] | undefined, byteOffset: number) {
