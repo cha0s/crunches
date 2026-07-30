@@ -60,11 +60,11 @@ export class Protocol<
     const id = varuintCodec.decodeFrom(view, target)
     const type = this.idToType.get(id)
     if (!type) {
-      throw new TypeError(`Tried decoding unknown codec: '${String(type)}'`)
+      throw new TypeError(`Tried decoding unknown codec ID: '${String(id)}'`)
     }
     const codec = this.codecs.get(type)
     if (!codec) {
-      throw new TypeError(`Tried decoding unknown codec: '${String(type)}'`)
+      throw new TypeError(`Tried decoding unknown codec type: '${String(type)}'`)
     }
     return { type, payload: codec.decodeFrom(view, target) } as Payloads<P>
   }
