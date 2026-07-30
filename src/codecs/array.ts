@@ -276,15 +276,7 @@ export class CrunchesArray<
         }
         // TypedArray
         if (this.canBeEncodedAsTypedArray(value)) {
-          if (Array.isArray(value)) {
-            return size + value.length * this.$$typedArray!.BYTES_PER_ELEMENT
-          }
-          if (value instanceof Set) {
-            return size + value.size * this.$$typedArray!.BYTES_PER_ELEMENT
-          }
-          for (const element of value) {
-            size += this.$$elementCodec.sizeOf(element, byteOffset + size)
-          }
+          return size + (value as E['_input']).length * this.$$typedArray!.BYTES_PER_ELEMENT
         }
         else {
           for (const element of value) {
