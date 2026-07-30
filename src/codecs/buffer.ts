@@ -24,8 +24,8 @@ export class CrunchesBuffer extends CrunchesType<DataView, ArrayBufferLike> {
 
   encodeInto(value: ArrayBufferLike, view: DataView, byteOffset: number) {
     const prefixLength = this.prefix.encodeInto(value.byteLength, view, byteOffset)
-    new Uint8Array(view.buffer, view.byteOffset)
-      .set(new Uint8Array(value), byteOffset + prefixLength)
+    new Uint8Array(view.buffer)
+      .set(new Uint8Array(value), view.byteOffset + byteOffset + prefixLength)
     return prefixLength + value.byteLength
   }
 
