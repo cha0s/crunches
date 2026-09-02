@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.6](https://github.com/cha0s/crunches/compare/crunches-v3.3.5...crunches-v3.3.6) (2026-09-02)
+
+
+### Bug Fixes
+
+* a bunch of edge cases ([55b37c6](https://github.com/cha0s/crunches/commit/55b37c64f650977c593329995394c8c85284f83a))
+
 ## [3.3.5](https://github.com/cha0s/crunches/compare/crunches-v3.3.4...crunches-v3.3.5) (2026-07-30)
 
 
