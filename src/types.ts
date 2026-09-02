@@ -119,7 +119,7 @@ export class CrunchesOptional<Inner extends CrunchesType<unknown, unknown>>
   }
 
   bigEndian(): this {
-    this.inner.isLittleEndian = false
+    this.inner.bigEndian()
     return this
   }
 
@@ -132,7 +132,7 @@ export class CrunchesOptional<Inner extends CrunchesType<unknown, unknown>>
   }
 
   littleEndian(): this {
-    this.inner.isLittleEndian = true
+    this.inner.littleEndian()
     return this
   }
 

@@ -1,6 +1,7 @@
 import { CrunchesType, type Target } from '#types'
 
 import { CrunchesArray, type CrunchesArrayInput } from './array.ts'
+import { reiterable } from '../reiterable.ts'
 
 type ExtractIterable<T> = T extends Iterable<infer V, any, any> ? V : never
 
@@ -59,7 +60,7 @@ export class CrunchesMap <
   ): number {
     const keys: ExtractIterable<CrunchesArrayInput<K, IsSparse>>[] = []
     const values: ExtractIterable<CrunchesArrayInput<V, IsSparse>>[] = []
-    for (const [k, v] of value as Iterable<[typeof keys[number], typeof values[number]]>) {
+    for (const [k, v] of reiterable(value) as Iterable<[typeof keys[number], typeof values[number]]>) {
       keys.push(k)
       values.push(v)
     }
@@ -86,7 +87,7 @@ export class CrunchesMap <
   ): number {
     const keys: ExtractIterable<CrunchesArrayInput<K, IsSparse>>[] = []
     const values: ExtractIterable<CrunchesArrayInput<V, IsSparse>>[] = []
-    for (const [k, v] of value as Iterable<[typeof keys[number], typeof values[number]]>) {
+    for (const [k, v] of reiterable(value) as Iterable<[typeof keys[number], typeof values[number]]>) {
       keys.push(k)
       values.push(v)
     }

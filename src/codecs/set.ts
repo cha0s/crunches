@@ -1,6 +1,7 @@
 import { CrunchesType, type Target } from '#types'
 
 import { CrunchesArray } from './array.ts'
+import { reiterable } from '../reiterable.ts'
 
 /**
  * Set codec.
@@ -36,7 +37,7 @@ export class CrunchesSet<E extends CrunchesType<unknown, unknown>>
     byteOffset: number,
   ): number {
     const entries: Array<E['_input']> = []
-    for (const item of value) {
+    for (const item of reiterable(value)) {
       entries.push(item)
     }
     return this.$$array.encodeInto(entries as any, view, byteOffset)
@@ -54,7 +55,7 @@ export class CrunchesSet<E extends CrunchesType<unknown, unknown>>
     byteOffset: number
   ): number {
     const entries: Array<E['_input']> = []
-    for (const item of value) {
+    for (const item of reiterable(value)) {
       entries.push(item)
     }
     return this.$$array.sizeOf(entries as any, byteOffset)

@@ -6,6 +6,30 @@ import { CrunchesVarUint } from './varuint.ts'
 const decoder = new TextDecoder()
 const encoder = new TextEncoder()
 
+function utf8ByteLength(value: string) {
+  let length = 0
+  for (let i = 0; i < value.length; ++i) {
+    const code = value.charCodeAt(i)
+    if (code < 0x80) {
+      length += 1
+    }
+    else if (code < 0x800) {
+      length += 2
+    }
+    else if (0xd800 <= code && code <= 0xdbff && i + 1 < value.length) {
+      const next = value.charCodeAt(i + 1)
+      length += (0xdc00 <= next && next <= 0xdfff) ? 4 : 3
+      if (0xdc00 <= next && next <= 0xdfff) {
+        i += 1
+      }
+    }
+    else {
+      length += 3
+    }
+  }
+  return length
+}
+
 /**
  * String codec.
  */
@@ -36,12 +60,13 @@ export class CrunchesString extends CrunchesType<string> {
   }
 
   encodeInto(value: string, view: DataView, byteOffset: number) {
-    const prefixLength = this.prefix.sizeOf(value.length * 3)
+    const size = utf8ByteLength(value)
+    const prefixLength = this.prefix.sizeOf(size)
     const { written } = encoder.encodeInto(
       value,
       new Uint8Array(view.buffer, view.byteOffset + byteOffset + prefixLength),
     )
-    this.prefix.encodeInto(written, view, byteOffset)
+    this.prefix.encodeInto(size, view, byteOffset)
     return prefixLength + written
   }
 
@@ -53,7 +78,7 @@ export class CrunchesString extends CrunchesType<string> {
   }
 
   sizeOf(value: string) {
-    return this.prefix.sizeOf(value.length * 3) + (encoder.encode(value)).length
+    return this.prefix.sizeOf(utf8ByteLength(value)) + utf8ByteLength(value)
   }
 
 }

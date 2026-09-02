@@ -7,6 +7,7 @@ import {
 
 import { boolean, type CrunchesBoolean } from './boolean'
 import { CrunchesUint8, uint8 } from './uint8'
+import { reiterable } from '../reiterable.ts'
 
 type TypedArrayFor<E extends CrunchesNumeric<number | bigint>> =
   InstanceType<E['typedArray']>
@@ -60,6 +61,20 @@ export class CrunchesArray<
     this.$$typedArray = element instanceof CrunchesNumeric ? element.typedArray : undefined
   }
 
+  private canUseTypedArray(): boolean {
+    return !!this.$$typedArray
+      && false !== this.$$elementCodec.isLittleEndian
+      && (!this.$$isPossiblySparse || ((BigInt64Array !== this.$$typedArray) && (BigUint64Array !== this.$$typedArray)))
+  }
+
+  private absoluteByteOffset(view: DataView, byteOffset: number) {
+    return view.byteOffset + byteOffset
+  }
+
+  private typedArrayOffset(view: DataView, byteOffset: number) {
+    return this.absoluteByteOffset(view, byteOffset) % this.$$typedArray!.BYTES_PER_ELEMENT
+  }
+
   bigEndian(): this {
     if (undefined === this.$$elementCodec.isLittleEndian) {
       this.$$elementCodec.bigEndian()
@@ -70,16 +85,8 @@ export class CrunchesArray<
   }
 
   canBeEncodedAsTypedArray(value: any) {
-    const { typedArray } = this.$$elementCodec as any
-    return (
-      typedArray
-      && (
-        !this.$$isPossiblySparse
-        || ((BigInt64Array !== typedArray) && (BigUint64Array !== typedArray))
-      )
-      && false !== this.$$elementCodec.isLittleEndian
+    return this.canUseTypedArray()
       && (Array.isArray(value) || ArrayBuffer.isView(value))
-    )
   }
 
   decodeFrom(view: DataView, target: Target) {
@@ -103,18 +110,21 @@ export class CrunchesArray<
       }
       return value as CrunchesArrayOutput<E, IsSparse>
     }
-    // static shape
-    if (
-      this.$$typedArray
-      && (!this.$$isPossiblySparse || ((BigInt64Array !== this.$$typedArray) && (BigUint64Array !== this.$$typedArray)))
-    ) {
-      target.byteOffset += this.$$elementCodec.padding(target.byteOffset)
-      const value = new this.$$typedArray(view.buffer as ArrayBuffer, view.byteOffset + target.byteOffset, length)
-      target.byteOffset += this.$$typedArray.BYTES_PER_ELEMENT * length
-      return value as CrunchesArrayOutput<E, IsSparse>
+    if (this.$$typedArray) {
+      const offset = target.byteOffset + this.$$elementCodec.padding(target.byteOffset)
+      target.byteOffset = offset
+      if (
+        false !== this.$$elementCodec.isLittleEndian
+        && (!this.$$isPossiblySparse || ((BigInt64Array !== this.$$typedArray) && (BigUint64Array !== this.$$typedArray)))
+        && 0 === this.typedArrayOffset(view, offset)
+      ) {
+        const value = new this.$$typedArray(view.buffer as ArrayBuffer, this.absoluteByteOffset(view, offset), length)
+        target.byteOffset += this.$$typedArray.BYTES_PER_ELEMENT * length
+        return value as CrunchesArrayOutput<E, IsSparse>
+      }
     }
     // dynamic shape
-    else {
+    {
       const value: Array<E['_output']> = Array(length)
       for (let i = 0; i < length; ++i) {
         value[i] = this.$$elementCodec.decodeFrom(view, target)
@@ -124,13 +134,26 @@ export class CrunchesArray<
   }
 
   encodeInto(value: CrunchesArrayInput<E, IsSparse>, view: DataView, byteOffset: number) {
+    value = reiterable(value)
     let written = 0
     let isDense = true
-    if (this.$$isPossiblySparse && !this.canBeEncodedAsTypedArray(value)) {
-      for (const element of value) {
-        if (undefined === element) {
-          isDense = false
-          break
+    if (this.$$isPossiblySparse) {
+      if (this.canBeEncodedAsTypedArray(value)) {
+        if (Array.isArray(value)) {
+          for (let i = 0; i < value.length; ++i) {
+            if (undefined === value[i] && i in value) {
+              isDense = false
+              break
+            }
+          }
+        }
+      }
+      else {
+        for (const element of value) {
+          if (undefined === element) {
+            isDense = false
+            break
+          }
         }
       }
     }
@@ -161,11 +184,11 @@ export class CrunchesArray<
           written += this.$$elementCodec.padding(byteOffset + written)
         }
         // TypedArray
-        if (this.canBeEncodedAsTypedArray(value)) {
+        if (this.canBeEncodedAsTypedArray(value) && 0 === this.typedArrayOffset(view, byteOffset + written)) {
           length = (value as E['_input']).length
           new this.$$typedArray!(
             view.buffer as ArrayBuffer,
-            view.byteOffset + byteOffset + written,
+            this.absoluteByteOffset(view, byteOffset + written),
             length,
           ).set(Array.isArray(value) ? new this.$$typedArray!(value) : value as any)
           written += this.$$typedArray!.BYTES_PER_ELEMENT * length
@@ -207,10 +230,13 @@ export class CrunchesArray<
           written += this.$$elementCodec.padding(byteOffset + written)
         }
         // TypedArray
-        if (this.canBeEncodedAsTypedArray(value)) {
+        if (this.canBeEncodedAsTypedArray(value) && 0 === this.typedArrayOffset(view, byteOffset + written)) {
+          if ((value as E['_input']).length < this.length) {
+            throw new RangeError(`Array length (${(value as E['_input']).length}) is shorter than fixed array length (${this.length})`)
+          }
           new this.$$typedArray!(
             view.buffer as ArrayBuffer,
-            view.byteOffset + byteOffset + written,
+            this.absoluteByteOffset(view, byteOffset + written),
             this.length,
           ).set(Array.isArray(value) ? new this.$$typedArray!(value) : value as any)
           written += this.$$typedArray!.BYTES_PER_ELEMENT * this.length
@@ -220,6 +246,9 @@ export class CrunchesArray<
           let protocol = value[Symbol.iterator]()
           let result = protocol.next()
           for (let i = 0; i < this.length; ++i) {
+            if (result.done) {
+              throw new RangeError(`Array length (${i}) is shorter than fixed array length (${this.length})`)
+            }
             written += this.$$elementCodec.encodeInto(result.value, view, byteOffset + written)
             result = protocol.next()
           }
@@ -239,13 +268,26 @@ export class CrunchesArray<
   }
 
   sizeOf(value: CrunchesArrayInput<E, IsSparse>, byteOffset: number) {
+    value = reiterable(value)
     let isDense = true
     let size = 0
-    if (this.$$isPossiblySparse && !this.canBeEncodedAsTypedArray(value)) {
-      for (const element of value) {
-        if (undefined === element) {
-          isDense = false
-          break
+    if (this.$$isPossiblySparse) {
+      if (this.canBeEncodedAsTypedArray(value)) {
+        if (Array.isArray(value)) {
+          for (let i = 0; i < value.length; ++i) {
+            if (undefined === value[i] && i in value) {
+              isDense = false
+              break
+            }
+          }
+        }
+      }
+      else {
+        for (const element of value) {
+          if (undefined === element) {
+            isDense = false
+            break
+          }
         }
       }
     }
@@ -309,6 +351,9 @@ export class CrunchesArray<
         }
         // TypedArray
         if (this.canBeEncodedAsTypedArray(value)) {
+          if ((value as E['_input']).length < this.length) {
+            throw new RangeError(`Array length (${(value as E['_input']).length}) is shorter than fixed array length (${this.length})`)
+          }
           size += this.length * this.$$typedArray!.BYTES_PER_ELEMENT
         }
         // iterable
@@ -316,6 +361,9 @@ export class CrunchesArray<
           let protocol = value[Symbol.iterator]()
           let result = protocol.next()
           for (let i = 0; i < this.length; ++i) {
+            if (result.done) {
+              throw new RangeError(`Array length (${i}) is shorter than fixed array length (${this.length})`)
+            }
             size += this.$$elementCodec.sizeOf(result.value, size + byteOffset)
             result = protocol.next()
           }

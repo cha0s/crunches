@@ -95,7 +95,12 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
         `
       }
       else {
-        decoderCode += `value[${sanitizedKey}] = this.$$codecs[${i}].decodeFrom(view, target);`
+        if ('__proto__' === key) {
+          decoderCode += `Object.defineProperty(value, ${sanitizedKey}, { value: this.$$codecs[${i}].decodeFrom(view, target), enumerable: true, writable: true, configurable: true });`
+        }
+        else {
+          decoderCode += `value[${sanitizedKey}] = this.$$codecs[${i}].decodeFrom(view, target);`
+        }
         encoderCode += `written += this.$$codecs[${i}].encodeInto(value[${sanitizedKey}], view, byteOffset + written);`
       }
       if (property instanceof CrunchesOptional) {
@@ -123,7 +128,12 @@ export class CrunchesObject<P extends Record<string, CrunchesBase<unknown, unkno
             target.byteOffset += 1
           }
           for (const { bit, index, key } of booleanBackpatches) {
-            value[key] = !!(booleanFlags[index] & (1 << bit))
+            if ('__proto__' === key) {
+              Object.defineProperty(value, key, { value: !!(booleanFlags[index] & (1 << bit)), enumerable: true, writable: true, configurable: true })
+            }
+            else {
+              value[key] = !!(booleanFlags[index] & (1 << bit))
+            }
           }
         }
       `
